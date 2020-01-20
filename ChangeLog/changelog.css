@@ -1,10 +1,11 @@
 @charset "utf-8";
 /* CSS Document */
 .date{
-	font-family:  "黑体";
-	font-size: 30px;
+	font-family:  "宋体";
+	font-weight: "bold";
+	font-size: 25px;
 }
 .content{
-	font-family: "华文行楷";
-	font-size: 25px;
+	font-family: "华文楷体";
+	font-size: 20px;
 }
