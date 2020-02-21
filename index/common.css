@@ -1,0 +1,17 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+#neteasediv,
+#xpdiv,
+#bapplediv,
+#magiskdiv,
+#kmspicodiv{
+    width: 95%;
+    height: auto;
+}
+#end{
+    font-size: 12px;
+    color: darkgray;
+    text-align: center;
+}

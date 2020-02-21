@@ -1,0 +1,64 @@
+#navbar{
+    position:fixed;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    padding: 0px;
+    width: 150px;
+    height: 100%;
+    background-color: #f1f1f1;
+    overflow: auto;
+}
+#navbar ul{
+    list-style-type: none;
+}
+#navbar li a{
+    display: block;
+    color: #000;
+    padding: 8px 0px 8px 8px;
+    text-decoration: none;
+} 
+#navbar li a:hover,
+#navbar li a:active
+{
+    background-color: #555;
+    color: white;
+}
+
+#body{
+    position:relative;
+    width: 88%;
+    left: 200px;
+}
+#unblockmusicpro,
+#unblockneteasemusic,
+#pureneteasecloudmusic,
+#taichi,
+#edxposed,
+#bapple,
+#magisk,
+#kmspico{
+    margin: 20px;
+    padding: 5px;
+    width: 300px;
+    height: auto;
+    box-shadow: 3px 3px 3px 3px #888888;
+    float: left;
+    font-size: 15px;
+    line-height: 25px;
+}
+
+.button{
+    margin: 5px;
+    padding: 10px;
+    border: 0px;
+    background-color: rgb(0, 0, 0, 0.1);
+}
+.cf{
+    clear: both;
+}
+.module{
+    box-shadow: 3px 3px 3px 3px #888888;
+    margin:10px;
+    padding: 5px;
+}
