@@ -1,3 +1,6 @@
+#head{
+    display: none;
+}
 #navbar{
     position:fixed;
     margin-top: 10px;
@@ -9,15 +12,6 @@
     background-color: #f1f1f1;
     overflow: auto;
 }
-#navbar ul{
-    list-style-type: none;
-}
-#navbar li a{
-    display: block;
-    color: #000;
-    padding: 8px 0px 8px 8px;
-    text-decoration: none;
-} 
 #navbar li a:hover,
 #navbar li a:active
 {
