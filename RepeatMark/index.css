@@ -1,0 +1,41 @@
+/*index.css*/
+
+#LeftTitle,RightTitle{
+	background-color: red;
+	width: 50%;
+	float: left;
+	background-color: oldlace;
+}
+
+#RightTitle{
+	background-color: red;
+	width: 50%;
+	float: Right;
+	background-color: palegreen;
+}
+
+#DataArea{
+	position: static;
+	width: 100%;
+	height: 500px;
+}
+
+#StdNameArea{
+	width: 50%;
+	height: 100%;
+	float: left;
+	overflow: auto;
+	background-color: snow;
+}
+
+#RepeatArea{
+	width: 50%;
+	height: 100%;
+	float: right;
+	overflow: auto;
+	background-color: lightyellow;
+}
+
+#IOArea{
+	width: 100%;
+}

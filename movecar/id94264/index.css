@@ -1,0 +1,45 @@
+*       /*通配符*/
+{
+    margin:0px;       /*外边框*/     
+    padding:0px;       /*填充*/        
+}
+#tel
+{
+    text-align: center;
+    font-size: 100px;
+    margin: 40px 40px 0px 0px;
+    padding: 20px 20px 20px 20px;
+    width: 100%;
+}
+#btn
+{
+    text-align: center;
+    font-size: 100px;
+    margin: 30px 30px 0px 0px;
+    padding: 15px 15px 15px 15px;
+    width: 100%;
+}
+#btntel
+{
+    text-decoration:none;   /*去除a标签样式*/
+    background: black;   /*背景颜色*/
+    color:white;       /*颜色*/
+    padding:10px 40px;       /*填充*/  
+    border-radius:25px;     /*边框圆角*/
+}
+#version
+{
+    text-align: center;
+    position:absolute;
+    bottom: 35px;
+    width: 100%;
+}
+#email
+{
+    text-decoration:none;   /*去除a标签样式*/
+    text-align: center;
+    position:absolute;
+    bottom: 5px;
+    width: 100%;
+    color: black;
+}

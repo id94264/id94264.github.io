@@ -1,0 +1,40 @@
+<!-- note.html -->
+
+获取输入框内容：输入框id.value
+修改输入框内容：输入框id.value = XXX;
+
+获取数组宽度：数组名.length
+
+获取字符串宽度：字符串名.length
+
+对元素样式操作：元素id.style.属性 = "属性值"
+
+给HTML5中的标签增加class：标签ID.className="XXX"
+
+获取标签的class属性值：document.getElementsByClassName(class名)
+注意：返回的class是一个数组！！！！
+
+判断数据类型： typeof 单个数据
+
+截取字符串中的字符：字符串名.substr(第几个开始,截取几个)
+
+弹出提示框：alert()
+控制台输出：console.log()
+
+
+1. 需要一个数组，数组存放所有学生的姓名
+	1.1 var StdName
+
+2. 需要两个数组，把上面数字中的姓名分成两部分，一部分是存放两个名字的，一部分是存放三个名字的
+	2.1 var Std2Name, Std3Name
+	2.2 如果StdName[i].length == 2，就存入Std2Name;==3就 
+
+3. 把两个数组挨着输入到屏幕左半边中，添加<span>标签和id
+	3.1 for循环 Std2Name,3Name innerHTML += 
+
+4. 从输入框获取接龙信息，保存成一个字符串
+	var Data
+
+5. 两个名字的数组，挨着名字循环，名字字符串挨个字符循环，跟接龙信息字符串匹配，如果两个都相等，保存下来当前位置的字符串下标。再循环三个名字的数组。
+
+6. 输出匹配的结果，先innerHTML，在保存下标的位置插入<span>标签以及id信息，如果==空格，并且+1的类型为数字，插入回车换行。

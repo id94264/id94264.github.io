@@ -1,0 +1,72 @@
+#head{
+    position: fixed;
+    font-size: 50px;
+    text-align: center;
+    font-family: "隶书" ;
+    margin: 20px;
+    padding: 5px;
+    width: 90%;
+    height: auto;
+    box-shadow: 3px 3px 3px 3px #888888;
+    overflow: auto;
+}
+
+#menu{
+    display: none;
+}
+
+#navbar{
+    position:fixed;
+    margin-top: 110px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    padding: 0px;
+    width: 150px;
+    height: 100%;
+    background-color: #f1f1f1;
+    overflow: auto;
+}
+#navbar li a:hover,
+#navbar li a:active
+{
+    background-color: #555;
+    color: white;
+}
+
+#body{
+    position:relative;
+    /* margin: 0px 110px; */
+    width: 80%;
+    left: 200px;
+}
+.one{
+    margin: 20px;
+    padding: 5px; 
+    width: 300px;
+    height: auto;
+    box-shadow: 3px 3px 3px 3px #888888;
+    float: left;
+    font-size: 15px;
+    line-height: 25px;
+}
+
+.button{
+    margin: 10px 20px 10px 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border: 0px;
+    background-color: rgb(0, 0, 0, 0.1);
+}
+.cf{
+    clear: both;
+}
+.module{
+    box-shadow: 3px 3px 3px 3px #888888;
+    margin:10px;
+    padding: 5px;
+}
+#div00{
+    padding-top: 110px;
+}
