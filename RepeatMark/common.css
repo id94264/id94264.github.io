@@ -1,0 +1,66 @@
+/*common.css*/
+
+/*所有元素边框设置为0*/
+*{
+	margin: 0px;
+	padding: 0px;
+}
+
+/*数据区域 宽度 100% height不同*/
+#DataArea{
+	width: 100%;	/*宽度 100%*/
+}
+
+/*左侧标题 姓名：*/
+#LeftTitle{
+	margin: 5px;	/*外边框 5px*/
+	width: 45%;		/*宽度 45%*/
+	float: left;	/*浮动 左侧*/
+	background-color: oldlace;	/*背景颜色*/
+	font-weight: bold;	/*字体粗细 加粗*/
+}
+
+/*左侧标题 对比结果：*/
+#RightTitle{
+	margin: 5px;	/*外边框 5px*/
+	width: 45%;		/*宽度 45%*/
+	float: Right;	/*浮动 右侧*/
+	background-color: palegreen;	/*背景颜色*/
+	font-weight: bold;	/*字体粗细 加粗*/
+}
+
+/*原始姓名数据*/
+#StdNameArea{
+	margin: 5px;
+	width: 45%;	/*宽度 45%*/
+	height: 100%;	/*高 100%*/
+	float: left;	/*浮动 左侧*/
+	overflow: auto;	/*内容溢出 自动*/
+	background-color: snow;
+}
+
+/*对比数据区域*/
+#RepeatArea{
+	margin: 5px;
+	width: 45%;	/*宽度 45%*/
+	height: 100%;	/*高 100%*/
+	float: right;	/*浮动 右侧*/
+	overflow: auto;	/*内容溢出 自动*/
+	background-color: lightyellow;
+}
+
+#clear{
+	clear: both;
+}
+
+/*输入框和按钮区域*/
+#IOArea{
+	margin: 5px;
+	width: 100%;
+	display: flex;
+}
+
+
+#KeyArea{
+	display: flex;
+}

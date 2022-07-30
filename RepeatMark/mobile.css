@@ -1,0 +1,35 @@
+/*mobile.css*/
+
+/*文字输入框*/
+#DataInput{
+	margin: 1px;
+	width: 100%;
+	height: 50px;
+	font-size: 30px;
+}
+
+#IOArea{
+	flex-direction: column;
+}
+
+#KeyArea{
+	flex-direction: row;
+}
+
+#Run,#InputReset,#RepeatReset{
+	font-size: 30px;
+	margin: 1px;
+	width: 33%;
+	height: 50px;
+}
+
+/*数据区域*/
+#DataArea{
+	height: 1600px;	/*高度 900px*/
+	font-size: 50px;
+}
+
+/*原始姓名数据*/
+#StdNameArea{
+	font-size: 50px;
+}
