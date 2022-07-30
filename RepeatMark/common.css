@@ -49,10 +49,6 @@
 	background-color: lightyellow;
 }
 
-#clear{
-	clear: both;
-}
-
 /*输入框和按钮区域*/
 #IOArea{
 	margin: 5px;
