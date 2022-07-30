@@ -124,7 +124,7 @@ function RunF(){
 	// 获取flag的类名，添加背景颜色
 	var flag = document.getElementsByClassName("flag");
 	for(var s = 0; s < flag.length; s++){
-		flag[s].style.cssText += "background-color: red;";
+		flag[s].style.cssText += "background-color: pink;";
 	}
 }
 
