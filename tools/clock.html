@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全屏时钟</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        #time {
+            font-size: 20vw;
+            font-family: 'Arial', sans-serif;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .date-container {
+            display: flex;
+            gap: 4vw;
+            margin-top: 3vh;
+            font-size: 4vw;
+        }
+
+        #settings-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            min-width: 48px;
+            min-height: 48px;
+            touch-action: manipulation;
+        }
+
+        #settings-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 25px;
+            border-radius: 15px;
+            color: #fff;
+            display: none;
+            z-index: 1000;
+            min-width: 300px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #settings-panel.show {
+            display: block;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .settings-item {
+            margin: 20px 0;
+        }
+
+        .settings-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: #444;
+            border-radius: 4px;
+            outline: none;
+            touch-action: pan-y;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        @media (hover: none) {
+            #settings-button:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="time"></div>
+    <div class="date-container">
+        <div id="date"></div>
+        <div id="weekday"></div>
+    </div>
+
+    <button id="settings-button" aria-label="设置">⚙️</button>
+    <div id="overlay" onclick="closeSettings()"></div>
+    
+    <div id="settings-panel">
+        <h3>显示设置</h3>
+        
+        <div class="settings-item">
+            <label>时间字号 (<span id="timeSizeValue">20</span>vw)</label>
+            <input type="range" id="timeFontSize" min="10" max="60" value="20">
+        </div>
+
+        <div class="settings-item">
+            <label>日期字号 (<span id="dateSizeValue">4</span>vw)</label>
+            <input type="range" id="dateFontSize" min="2" max="15" value="4">
+        </div>
+
+        <div class="settings-item">
+            <label>文字颜色</label>
+            <input type="color" id="textColor">
+        </div>
+
+        <div class="settings-item">
+            <label>背景颜色</label>
+            <input type="color" id="bgColor">
+        </div>
+    </div>
+
+    <script>
+        // 时间更新
+        function updateTime() {
+            const now = new Date();
+            const timeOptions = { 
+                hour12: false,
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric'
+            };
+            
+            document.getElementById('time').textContent = now.toLocaleTimeString('zh-CN', timeOptions);
+            
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('date').textContent = `${year}年${month}月${day}日`;
+            
+            document.getElementById('weekday').textContent = now.toLocaleDateString('zh-CN', { 
+                weekday: 'long' 
+            });
+        }
+
+        // 设置面板控制
+        const settingsButton = document.getElementById('settings-button');
+        const settingsPanel = document.getElementById('settings-panel');
+        const overlay = document.getElementById('overlay');
+
+        function toggleSettings() {
+            settingsPanel.classList.toggle('show');
+            overlay.classList.toggle('show');
+            syncSettings();
+        }
+
+        function closeSettings() {
+            settingsPanel.classList.remove('show');
+            overlay.classList.remove('show');
+        }
+
+        // 核心修复：正确转换vw值
+        function getCurrentVwSize(element, defaultValue) {
+            const viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            const pxSize = parseFloat(getComputedStyle(element).fontSize);
+            return viewportWidth > 0 ? Math.round((pxSize / viewportWidth) * 100) : defaultValue;
+        }
+
+        // 同步设置显示
+        function syncSettings() {
+            // 时间字号
+            const timeVw = getCurrentVwSize(document.getElementById('time'), 20);
+            timeFontSize.value = timeVw;
+            document.getElementById('timeSizeValue').textContent = timeVw;
+
+            // 日期字号
+            const dateVw = getCurrentVwSize(document.querySelector('.date-container'), 4);
+            dateFontSize.value = dateVw;
+            document.getElementById('dateSizeValue').textContent = dateVw;
+
+            // 颜色设置
+            textColor.value = rgbToHex(getComputedStyle(document.body).color);
+            bgColor.value = rgbToHex(getComputedStyle(document.body).backgroundColor);
+        }
+
+        // RGB转HEX
+        function rgbToHex(rgb) {
+            const matches = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            if (!matches) return '#ffffff';
+            const hex = (x) => ("0" + parseInt(x).toString(16)).slice(-2);
+            return '#' + hex(matches[1]) + hex(matches[2]) + hex(matches[3]);
+        }
+
+        // 初始化元素引用
+        const timeFontSize = document.getElementById('timeFontSize');
+        const dateFontSize = document.getElementById('dateFontSize');
+        const textColor = document.getElementById('textColor');
+        const bgColor = document.getElementById('bgColor');
+
+        // 事件监听
+        settingsButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleSettings();
+        });
+
+        // 统一输入处理
+        function handleInput() {
+            document.getElementById('time').style.fontSize = `${timeFontSize.value}vw`;
+            document.querySelector('.date-container').style.fontSize = `${dateFontSize.value}vw`;
+            document.body.style.color = textColor.value;
+            document.body.style.backgroundColor = bgColor.value;
+            
+            // 实时更新显示值
+            document.getElementById('timeSizeValue').textContent = timeFontSize.value;
+            document.getElementById('dateSizeValue').textContent = dateFontSize.value;
+        }
+
+        // 绑定事件
+        [timeFontSize, dateFontSize, textColor, bgColor].forEach(element => {
+            element.addEventListener('input', handleInput);
+        });
+
+        // 窗口大小变化监听（可选）
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (settingsPanel.classList.contains('show')) {
+                    syncSettings();
+                }
+            }, 200);
+        });
+
+        // 初始化执行
+        updateTime();
+        setInterval(updateTime, 1000);
+        syncSettings(); // 确保初始值正确
+    </script>
+</body>
+</html>
