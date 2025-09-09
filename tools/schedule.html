@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程表</title>
+    <link rel="stylesheet" href="schedule.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>课程表</h1>
+            <p>点击课程格子可以编辑或添加课程</p>
+        </header>
+
+        <div class="controls">
+            <button id="addCourseBtn">添加课程</button>
+            <button id="settingsBtn">设置</button>
+        </div>
+
+        <div class="schedule-container">
+            <div class="schedule-table">
+                <table id="scheduleTable">
+                    <thead>
+                        <tr>
+                            <th>节次/时间</th>
+                            <th>周一</th>
+                            <th>周二</th>
+                            <th>周三</th>
+                            <th>周四</th>
+                            <th>周五</th>
+                            <th>周六</th>
+                            <th>周日</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 课程表内容将通过JavaScript生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 课程编辑模态框 -->
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加课程</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="courseForm">
+                <input type="hidden" id="editDay">
+                <input type="hidden" id="editPeriod">
+                
+                <div class="form-group">
+                    <label for="courseName">课程名称</label>
+                    <input type="text" id="courseName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="courseLocation">上课地点</label>
+                    <input type="text" id="courseLocation">
+                </div>
+                
+                <div class="form-group">
+                    <label for="courseTeacher">任课教师</label>
+                    <input type="text" id="courseTeacher">
+                </div>
+                
+                <div class="form-group">
+                    <label for="courseTime">上课时间</label>
+                    <select id="courseTime">
+                        <!-- 选项将根据设置动态生成 -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="courseDay">星期</label>
+                    <select id="courseDay">
+                        <option value="1">周一</option>
+                        <option value="2">周二</option>
+                        <option value="3">周三</option>
+                        <option value="4">周四</option>
+                        <option value="5">周五</option>
+                        <option value="6">周六</option>
+                        <option value="7">周日</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="deleteCourseBtn">删除课程</button>
+                    <button type="submit">保存课程</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content settings-modal-content">
+            <div class="modal-header">
+                <h2>课程表设置</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label>节次时间设置</label>
+                    <div id="periodSettings">
+                        <!-- 节次设置项将通过JavaScript生成 -->
+                    </div>
+                    <button type="button" class="add-period-btn" id="addPeriodBtn">新增节次</button>
+                </div>
+                
+                <!-- 新增导入导出功能区域 -->
+                <div class="form-group">
+                    <label>数据导入导出</label>
+                    <div class="form-actions" style="justify-content: flex-start; margin-top: 10px;">
+                        <button type="button" class="btn-secondary" id="exportDataBtn">导出数据</button>
+                        <button type="button" class="btn-secondary" id="importDataBtn">导入数据</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-danger" id="clearAllBtn">清空课程表</button>
+                    <button type="button" class="btn-secondary" id="resetSettingsBtn">恢复默认</button>
+                    <button type="submit">保存设置</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="schedule.js"></script>
+</body>
+</html>
