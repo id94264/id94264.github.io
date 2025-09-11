@@ -109,6 +109,41 @@ th {
     font-size: 13px;
 }
 
+/* 修改备注样式 */
+.course-note {
+    color: #3498db;
+    font-size: 12px;
+    margin-top: 3px;
+    display: none; /* 默认隐藏备注 */
+}
+
+.course-cell:hover .course-note {
+    display: block; /* 鼠标悬停时显示备注 */
+}
+
+/* 添加备注列表样式 */
+.notes-list {
+    margin-top: 5px;
+    padding: 5px;
+    background-color: #f0f8ff;
+    border-radius: 4px;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.note-item {
+    padding: 2px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px; /* 增大备注历史文字 */
+    color: #666;
+}
+
+.note-header {
+    font-weight: bold;
+    color: #3498db;
+    margin-bottom: 3px;
+}
+
 .modal {
     display: none;
     position: fixed;
@@ -126,29 +161,19 @@ th {
     background: white;
     border-radius: 10px;
     width: 90%;
-    max-width: 500px;
+    max-width: 700px; /* 增加模态框宽度以适应两栏布局 */
     padding: 25px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-.modal-header {
+/* 添加两栏布局样式 */
+.form-columns {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+    gap: 20px;
 }
 
-.modal-header h2 {
-    margin: 0;
-    color: #2c3e50;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #aaa;
+.form-column {
+    flex: 1;
 }
 
 .form-group {
@@ -266,6 +291,99 @@ th {
 
 .special-period {
     background-color: #e0e0e0;
+}
+
+/* 修改模态框标题样式，为关闭按钮留出空间 */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: auto;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+/* 增加备注输入框宽度 */
+#courseNote {
+    width: 100%;
+}
+
+/* 添加备注提示样式 */
+.note-indicator {
+    color: #3498db;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.note-item-actions {
+    margin-top: 5px;
+}
+
+.note-item-actions button {
+    padding: 2px 8px;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+/* 新增：备注历史区域样式修改 */
+.notes-history-container {
+    max-height: 400px; /* 从250px增加到400px */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* 新增：备注历史项样式 */
+.note-item {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 新增：日期时间和星期节次同行显示样式 */
+.note-header-period {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.note-header {
+    font-weight: bold;
+    color: #3498db;
+}
+
+.note-period {
+    color: #7f8c8d;
+}
+
+/* 新增：备注内容样式 */
+.note-content {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* 新增：解决滚轮问题的样式 */
+.notes-history-container:hover {
+    overflow-y: auto;
 }
 
 @media (max-width: 768px) {

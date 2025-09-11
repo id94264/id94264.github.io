@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>课程表</title>
     <link rel="stylesheet" href="schedule.css">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#3498db">
+    <meta name="description" content="课程表工具，支持个性化课程安排">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="../icons/icon-192x192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="../icons/icon-192x192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="课程表">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
     <div class="container">
@@ -52,39 +61,62 @@
                 <input type="hidden" id="editDay">
                 <input type="hidden" id="editPeriod">
                 
-                <div class="form-group">
-                    <label for="courseName">课程名称</label>
-                    <input type="text" id="courseName" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="courseLocation">上课地点</label>
-                    <input type="text" id="courseLocation">
-                </div>
-                
-                <div class="form-group">
-                    <label for="courseTeacher">任课教师</label>
-                    <input type="text" id="courseTeacher">
-                </div>
-                
-                <div class="form-group">
-                    <label for="courseTime">上课时间</label>
-                    <select id="courseTime">
-                        <!-- 选项将根据设置动态生成 -->
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="courseDay">星期</label>
-                    <select id="courseDay">
-                        <option value="1">周一</option>
-                        <option value="2">周二</option>
-                        <option value="3">周三</option>
-                        <option value="4">周四</option>
-                        <option value="5">周五</option>
-                        <option value="6">周六</option>
-                        <option value="7">周日</option>
-                    </select>
+                <div class="form-columns">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="courseName">课程名称</label>
+                            <input type="text" id="courseName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="courseLocation">上课地点</label>
+                            <input type="text" id="courseLocation">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="courseTeacher">任课教师</label>
+                            <input type="text" id="courseTeacher">
+                        </div>
+                        
+                        <!-- 将日期时间和星期节次分开显示 -->
+                        <div class="form-group">
+                            <label for="courseTime">上课时间</label>
+                            <select id="courseTime">
+                                <!-- 选项将根据设置动态生成 -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="courseDay">星期</label>
+                            <select id="courseDay">
+                                <option value="1">周一</option>
+                                <option value="2">周二</option>
+                                <option value="3">周三</option>
+                                <option value="4">周四</option>
+                                <option value="5">周五</option>
+                                <option value="6">周六</option>
+                                <option value="7">周日</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-column">
+                        <!-- 备注输入框移到右侧 -->
+                        <div class="form-group">
+                            <label for="courseNote">备注</label>
+                            <textarea id="courseNote" rows="4" placeholder="输入备注内容，按Ctrl+Enter换行"></textarea>
+                        </div>
+                        <div class="form-group" style="text-align: right;">
+                            <button type="button" id="saveNoteBtn">保存备注</button>
+                        </div>
+                        
+                        <!-- 添加备注历史显示区域 -->
+                        <div class="form-group">
+                            <div id="notesHistory" class="notes-history-container">
+                                <p style="color: #999; font-style: italic;">暂无备注历史</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="form-actions">
@@ -131,5 +163,20 @@
     </div>
 
     <script src="schedule.js"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                })
+                .catch(function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
