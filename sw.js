@@ -5,7 +5,8 @@ const urlsToCache = [
   '/tools/clock.html',
   '/tools/schedule.html',
   '/tools/schedule.css',
-  '/tools/schedule.js'
+  '/tools/schedule.js',
+  '/manifest.json'
 ];
 
 // 安装事件 - 缓存资源
