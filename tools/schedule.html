@@ -104,7 +104,7 @@
                         <!-- 备注输入框移到右侧 -->
                         <div class="form-group">
                             <label for="courseNote">备注</label>
-                            <textarea id="courseNote" rows="4" placeholder="输入备注内容，按Ctrl+Enter换行"></textarea>
+                            <textarea id="courseNote" rows="4" placeholder="输入备注内容，按Enter换行"></textarea>
                         </div>
                         <div class="form-group" style="text-align: right;">
                             <button type="button" id="saveNoteBtn">保存备注</button>
@@ -119,9 +119,14 @@
                     </div>
                 </div>
                 
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" id="deleteCourseBtn">删除课程</button>
-                    <button type="submit">保存课程</button>
+                <div class="course-form-actions">
+                    <div class="left-buttons">
+                        <button type="button" class="btn-danger" id="deleteCourseBtn">删除课程</button>
+                    </div>
+                    <div class="right-buttons">
+                        <button type="button" class="btn-secondary" id="cancelCourseBtn">取消</button>
+                        <button type="submit">保存课程</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -153,10 +158,15 @@
                     </div>
                 </div>
                 
-                <div class="form-actions">
-                    <button type="button" class="btn-danger" id="clearAllBtn">清空课程表</button>
-                    <button type="button" class="btn-secondary" id="resetSettingsBtn">恢复默认</button>
-                    <button type="submit">保存设置</button>
+                <div class="settings-form-actions">
+                    <div class="left-buttons">
+                        <button type="button" class="btn-danger" id="clearAllBtn">清空课程表</button>
+                        <button type="button" class="btn-secondary" id="resetSettingsBtn">恢复默认</button>
+                    </div>
+                    <div class="right-buttons">
+                        <button type="button" class="btn-secondary" id="cancelSettingsBtn">取消</button>
+                        <button type="submit">保存设置</button>
+                    </div>
                 </div>
             </form>
         </div>

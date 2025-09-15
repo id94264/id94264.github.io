@@ -114,11 +114,27 @@ th {
     color: #3498db;
     font-size: 12px;
     margin-top: 3px;
-    display: none; /* 默认隐藏备注 */
+    display: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%; /* 宽度继承父容器 */
+    box-sizing: border-box; /* 包含padding计算宽度 */
 }
 
 .course-cell:hover .course-note {
-    display: block; /* 鼠标悬停时显示备注 */
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2px 5px;
+    z-index: 1;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    max-height: 60px;
 }
 
 /* 添加备注列表样式 */
@@ -164,6 +180,8 @@ th {
     max-width: 700px; /* 增加模态框宽度以适应两栏布局 */
     padding: 25px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    max-height: 90vh; /* 限制最大高度 */
+    overflow-y: auto; /* 允许垂直滚动 */
 }
 
 /* 添加两栏布局样式 */
@@ -192,6 +210,16 @@ th {
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 16px;
+}
+
+/* 修改导入导出按钮样式 */
+#importDataBtn, #exportDataBtn {
+    background: #3498db;
+    margin-bottom: 15px; /* 增加与下方按钮的间距 */
+}
+
+#importDataBtn:hover, #exportDataBtn:hover {
+    background: #2980b9;
 }
 
 .form-actions {
@@ -240,6 +268,8 @@ th {
 /* 设置模态框样式 */
 .settings-modal-content {
     max-width: 600px;
+    max-height: 90vh; /* 限制最大高度 */
+    overflow-y: auto; /* 允许垂直滚动 */
 }
 
 .period-setting {
@@ -274,6 +304,8 @@ th {
 .add-period-btn {
     margin-top: 10px;
     background: #27ae60;
+    margin-left: auto; /* 靠右对齐 */
+    display: block;
 }
 
 .add-period-btn:hover {
@@ -384,6 +416,54 @@ th {
 /* 新增：解决滚轮问题的样式 */
 .notes-history-container:hover {
     overflow-y: auto;
+}
+
+/* 新增：设置界面按钮对齐样式 */
+.settings-form-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.settings-form-actions .left-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.settings-form-actions .right-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* 新增：课程编辑界面按钮对齐样式 */
+.course-form-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.course-form-actions .left-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.course-form-actions .right-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* 新增：编辑备注界面按钮对齐样式 */
+.edit-note-form-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.edit-note-form-actions .left-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-note-form-actions .right-buttons {
+    display: flex;
+    gap: 10px;
 }
 
 @media (max-width: 768px) {

@@ -1,4 +1,4 @@
-// 课程表数据结构
+ // 课程表数据结构
 let scheduleData = {};
 
 // 节次时间设置
@@ -96,22 +96,30 @@ function generateScheduleTable() {
                 // 显示课程信息
                 let notesHTML = '';
                 if (course.notes && course.notes.length > 0) {
-                    // 显示最新的备注
+                    // 截取前10个字符并添加省略号
                     const latestNote = course.notes[course.notes.length - 1];
-                    notesHTML = `<div class="course-note">${latestNote.content}</div>`;
+                    const shortNote = latestNote.content.length > 10 
+                        ? latestNote.content.substring(0, 10) + '...' 
+                        : latestNote.content;
+                    notesHTML = `<div class="course-note">${shortNote}</div>`;
                 } else if (course.note) {
                     // 兼容旧版本的单条备注
-                    notesHTML = `<div class="course-note">${course.note}</div>`;
+                    const shortNote = course.note.length > 10 
+                        ? course.note.substring(0, 10) + '...' 
+                        : course.note;
+                    notesHTML = `<div class="course-note">${shortNote}</div>`;
                 }
-                
+
                 cell.innerHTML = `
                     <div class="course-info">
                         <div class="course-name">${course.name}</div>
                         <div class="course-location">${course.location}</div>
                         <div class="course-teacher">${course.teacher}</div>
-                        ${course.note || (course.notes && course.notes.length > 0) ? `<div class="note-indicator">★</div>` : ''}
+                        <div class="course-details">
+                            ${course.note || (course.notes && course.notes.length > 0) ? `<div class="note-indicator">★</div>` : ''}
+                            ${notesHTML}
+                        </div>
                     </div>
-                    ${notesHTML}
                 `;
             } else {
                 cell.innerHTML = '<div class="empty-cell"></div>';
@@ -251,8 +259,40 @@ function bindEvents() {
     // 添加保存备注按钮事件监听
     document.getElementById('saveNoteBtn').addEventListener('click', saveNote);
     
+    // 为备注输入框添加回车换行功能
+    document.getElementById('courseNote').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            // 插入换行符
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + '\n' + this.value.substring(end);
+            // 调整光标位置
+            this.selectionStart = this.selectionEnd = start + 1;
+        }
+    });
+    
+    // 添加课程模态框取消按钮事件监听
+    document.getElementById('cancelCourseBtn').addEventListener('click', closeAllModals);
+    
+    // 添加设置模态框取消按钮事件监听
+    document.getElementById('cancelSettingsBtn').addEventListener('click', closeAllModals);
+    
     // 绑定课程单元格点击事件
     bindCourseCellEvents();
+    
+    // 为备注输入框添加回车换行功能
+    document.getElementById('courseNote').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            // 插入换行符
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + '\n' + this.value.substring(end);
+            // 调整光标位置
+            this.selectionStart = this.selectionEnd = start + 1;
+        }
+    });
 }
 
 // 保存备注函数
@@ -285,7 +325,6 @@ function saveNote() {
             // 清空备注输入框
             document.getElementById('courseNote').value = '';
             
-            alert('备注已保存');
         }
     } else if (!noteContent) {
         alert('请输入备注内容');
@@ -303,13 +342,15 @@ function updateNotesHistory(courseKey) {
         Object.keys(scheduleData).forEach(key => {
             const course = scheduleData[key];
             if (course.name === currentCourseName && course.notes && course.notes.length > 0) {
-                course.notes.forEach(note => {
+                // 修改：保存原始note索引
+                course.notes.forEach((note, noteIndex) => {
                     const [day, period] = key.split('-');
                     allNotes.push({
                         ...note,
                         day: parseInt(day),
                         period: parseInt(period),
-                        courseKey: key
+                        courseKey: key,
+                        noteIndex: noteIndex
                     });
                 });
             }
@@ -320,54 +361,39 @@ function updateNotesHistory(courseKey) {
         
         if (allNotes.length > 0) {
             let historyHTML = '';
-            allNotes.forEach((note, index) => {
+            allNotes.forEach((note) => {
                 const dayName = getDayName(note.day);
                 const periodName = periodSettings[note.period - 1]?.name || `第${note.period}节`;
-                // 修改：将日期时间和星期节次放在同一行显示，并去除秒数
-                const formattedTime = formatDateTimeWithoutSeconds(note.timestamp);
-                historyHTML += `<div class="note-item" data-key="${note.courseKey}" data-index="${index}">
+                // 修改：使用保留秒数的格式化函数
+                const formattedTime = formatDateTimeWithSeconds(note.timestamp);
+                const formattedContent = note.content.replace(/\n/g, '<br>');
+                historyHTML += `<div class="note-item" data-key="${note.courseKey}" data-index="${note.noteIndex}">
                     <div class="note-header-period">
                         <span class="note-header">${formattedTime}</span>
                         <span class="note-period">星期${dayName} ${periodName}</span>
                     </div>
-                    <div class="note-content">${note.content}</div>
+                    <div class="note-content">${formattedContent}</div>
                     <div class="note-item-actions">
-                        <button class="edit-note-btn" data-key="${note.courseKey}" data-index="${index}">编辑</button>
-                        <button class="delete-note-btn" data-key="${note.courseKey}" data-index="${index}">删除</button>
+                        <button class="edit-note-btn" data-key="${note.courseKey}" data-index="${note.noteIndex}">编辑</button>
+                        <button class="delete-note-btn" data-key="${note.courseKey}" data-index="${note.noteIndex}">删除</button>
                     </div>
                 </div>`;
             });
-            // 修改：使用新的容器类名以增加高度和解决滚轮问题
             notesHistory.innerHTML = historyHTML;
             notesHistory.className = 'notes-history-container';
             
-            // 绑定编辑和删除按钮事件
-            document.querySelectorAll('.edit-note-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const key = this.dataset.key;
-                    editNote(key, parseInt(this.dataset.index));
-                });
-            });
-            
-            document.querySelectorAll('.delete-note-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const key = this.dataset.key;
-                    deleteNote(key, parseInt(this.dataset.index));
-                });
-            });
-            
-            // 添加滚轮事件监听器解决滚轮问题
+            // 使用事件委托处理动态生成的元素
             notesHistory.addEventListener('wheel', function(e) {
                 this.scrollTop += e.deltaY;
                 e.preventDefault();
             });
         } else {
             notesHistory.innerHTML = '<p style="color: #999; font-style: italic;">暂无备注历史</p>';
-            notesHistory.className = ''; // 清除自定义类名
+            notesHistory.className = '';
         }
     } else {
         notesHistory.innerHTML = '<p style="color: #999; font-style: italic;">暂无备注历史</p>';
-        notesHistory.className = ''; // 清除自定义类名
+        notesHistory.className = '';
     }
 }
 
@@ -375,177 +401,6 @@ function updateNotesHistory(courseKey) {
 function getDayName(dayIndex) {
     const days = ['一', '二', '三', '四', '五', '六', '日'];
     return days[dayIndex - 1];
-}
-
-// 编辑备注
-function editNote(courseKey, noteIndex) {
-    const note = scheduleData[courseKey].notes[noteIndex];
-    const [day, period] = courseKey.split('-');
-    
-    // 创建编辑备注的模态框
-    const editNoteModal = document.createElement('div');
-    editNoteModal.className = 'modal';
-    editNoteModal.id = 'editNoteModal';
-    editNoteModal.style.display = 'flex';
-    
-    editNoteModal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>编辑备注</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <form id="editNoteForm">
-                <div class="form-group">
-                    <label for="editNoteContent">备注内容</label>
-                    <textarea id="editNoteContent" rows="4" style="width: 100%;">${note.content}</textarea>
-                </div>
-                
-                <div class="form-group" style="display: flex; gap: 10px;">
-                    <div style="flex: 1;">
-                        <label for="editNoteTime">上课时间</label>
-                        <select id="editNoteTime">
-                            ${periodSettings.map((period, index) => 
-                                `<option value="${index + 1}" ${parseInt(period) === index + 1 ? 'selected' : ''}>
-                                    ${period.name} (${period.time})
-                                </option>`
-                            ).join('')}
-                        </select>
-                    </div>
-                    
-                    <div style="flex: 1;">
-                        <label for="editNoteDay">星期</label>
-                        <select id="editNoteDay">
-                            <option value="1" ${parseInt(day) === 1 ? 'selected' : ''}>周一</option>
-                            <option value="2" ${parseInt(day) === 2 ? 'selected' : ''}>周二</option>
-                            <option value="3" ${parseInt(day) === 3 ? 'selected' : ''}>周三</option>
-                            <option value="4" ${parseInt(day) === 4 ? 'selected' : ''}>周四</option>
-                            <option value="5" ${parseInt(day) === 5 ? 'selected' : ''}>周五</option>
-                            <option value="6" ${parseInt(day) === 6 ? 'selected' : ''}>周六</option>
-                            <option value="7" ${parseInt(day) === 7 ? 'selected' : ''}>周日</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- 新增：添加时间戳编辑字段 -->
-                <div class="form-group">
-                    <label for="editNoteTimestamp">日期时间</label>
-                    <input type="datetime-local" id="editNoteTimestamp" value="${formatDateTimeForInput(note.timestamp)}">
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" id="cancelEditNoteBtn">取消</button>
-                    <button type="button" class="btn-danger" id="deleteEditNoteBtn">删除</button>
-                    <button type="submit">保存</button>
-                </div>
-            </form>
-        </div>
-    `;
-    
-    document.body.appendChild(editNoteModal);
-    
-    // 绑定事件
-    const closeBtn = editNoteModal.querySelector('.close-btn');
-    const cancelBtn = document.getElementById('cancelEditNoteBtn');
-    const deleteBtn = document.getElementById('deleteEditNoteBtn');
-    const editNoteForm = document.getElementById('editNoteForm');
-    
-    const closeModal = () => {
-        document.body.removeChild(editNoteModal);
-    };
-    
-    closeBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
-    
-    deleteBtn.addEventListener('click', () => {
-        if (confirm('确定要删除这条备注吗？')) {
-            scheduleData[courseKey].notes.splice(noteIndex, 1);
-            if (scheduleData[courseKey].notes.length > 0) {
-                const latestNote = scheduleData[courseKey].notes[scheduleData[courseKey].notes.length - 1];
-                scheduleData[courseKey].note = latestNote.content;
-            } else {
-                delete scheduleData[courseKey].note;
-            }
-            saveScheduleData();
-            generateScheduleTable();
-            updateNotesHistory(courseKey);
-            closeModal();
-        }
-    });
-    
-    // 修复：正确设置节次和星期的默认值
-    const editNoteTime = document.getElementById('editNoteTime');
-    const editNoteDay = document.getElementById('editNoteDay');
-    
-    // 设置当前节次和星期的选中状态
-    editNoteTime.value = period;
-    editNoteDay.value = day;
-    
-    editNoteForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const newContent = document.getElementById('editNoteContent').value;
-        const newDay = document.getElementById('editNoteDay').value;
-        const newPeriod = document.getElementById('editNoteTime').value;
-        // 新增：获取时间戳值
-        const newTimestamp = document.getElementById('editNoteTimestamp').value;
-        const newCourseKey = `${newDay}-${newPeriod}`;
-        
-        // 如果更改了日期或节次，需要移动备注
-        if (newCourseKey !== courseKey) {
-            // 在新的位置创建课程数据（如果不存在）
-            if (!scheduleData[newCourseKey]) {
-                scheduleData[newCourseKey] = {
-                    name: `课程${newDay}-${newPeriod}`,
-                    location: '',
-                    teacher: '',
-                    notes: []
-                };
-            }
-            
-            // 将备注添加到新位置
-            scheduleData[newCourseKey].notes = scheduleData[newCourseKey].notes || [];
-            scheduleData[newCourseKey].notes.push({
-                content: newContent,
-                timestamp: newTimestamp ? formatInputDateTime(newTimestamp) : note.timestamp // 保持原时间戳或使用新时间戳
-            });
-            
-            // 从原位置删除备注
-            scheduleData[courseKey].notes.splice(noteIndex, 1);
-            
-            // 如果原位置没有备注了，删除note字段
-            if (scheduleData[courseKey].notes.length === 0) {
-                delete scheduleData[courseKey].note;
-            }
-        } else {
-            // 同位置修改备注
-            scheduleData[courseKey].notes[noteIndex].content = newContent;
-            // 新增：更新时间戳
-            if (newTimestamp) {
-                scheduleData[courseKey].notes[noteIndex].timestamp = formatInputDateTime(newTimestamp);
-            }
-        }
-        
-        saveScheduleData();
-        generateScheduleTable();
-        updateNotesHistory(newCourseKey);
-        closeModal();
-    });
-}
-
-// 删除备注
-function deleteNote(courseKey, noteIndex) {
-    if (confirm('确定要删除这条备注吗？')) {
-        scheduleData[courseKey].notes.splice(noteIndex, 1);
-        // 如果删除的是最后一条备注，更新当前显示的备注
-        if (scheduleData[courseKey].notes.length > 0) {
-            const latestNote = scheduleData[courseKey].notes[scheduleData[courseKey].notes.length - 1];
-            scheduleData[courseKey].note = latestNote.content;
-        } else {
-            delete scheduleData[courseKey].note;
-        }
-        saveScheduleData();
-        generateScheduleTable();
-        updateNotesHistory(courseKey);
-    }
 }
 
 // 打开课程编辑模态框
@@ -567,6 +422,7 @@ function openCourseModal(day, period) {
             document.getElementById('courseTeacher').value = course.teacher || '';
             document.getElementById('courseTime').value = period;
             document.getElementById('courseDay').value = day;
+            // 修改：确保删除按钮显示为inline-block
             deleteCourseBtn.style.display = 'inline-block';
             
             // 显示备注历史
@@ -859,6 +715,27 @@ function bindCourseCellEvents() {
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', initSchedule);
 
+// 使用事件委托处理备注历史中的编辑和删除按钮点击事件
+document.addEventListener('click', function(e) {
+    // 处理编辑按钮点击
+    if (e.target.classList.contains('edit-note-btn')) {
+        // 阻止事件冒泡到模态框背景
+        e.stopPropagation();
+        const key = e.target.dataset.key;
+        const index = parseInt(e.target.dataset.index);
+        editNote(key, index);
+    }
+    
+    // 处理删除按钮点击
+    if (e.target.classList.contains('delete-note-btn')) {
+        // 阻止事件冒泡到模态框背景
+        e.stopPropagation();
+        const key = e.target.dataset.key;
+        const index = parseInt(e.target.dataset.index);
+        deleteNote(key, index);
+    }
+});
+
 // 新增：格式化日期时间用于输入框显示（精确到分钟，去除秒数）
 function formatDateTimeForInput(dateTimeStr) {
     // 将 "YYYY/MM/DD HH:mm:ss" 或 "YYYY-MM-DD HH:mm:ss" 格式转换为 "YYYY-MM-DDTHH:mm" 格式
@@ -911,5 +788,295 @@ function formatDateTimeWithoutSeconds(dateTimeStr) {
         return `${year}/${month}/${day} ${hours}:${minutes}`;
     } catch (e) {
         return dateTimeStr; // 如果解析失败，返回原始字符串
+    }
+}
+
+// 新增：格式化日期时间（保留秒数）
+function formatDateTimeWithSeconds(dateTimeStr) {
+    try {
+        const date = new Date(dateTimeStr);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+    } catch (e) {
+        return dateTimeStr; // 如果解析失败，返回原始字符串
+    }
+}
+
+// 编辑备注
+function editNote(courseKey, noteIndex) {
+    // 修复：检查数据是否存在
+    if (!scheduleData[courseKey] || !scheduleData[courseKey].notes || scheduleData[courseKey].notes.length <= noteIndex) {
+        alert('备注数据不存在');
+        return;
+    }
+    
+    const note = scheduleData[courseKey].notes[noteIndex];
+    const [day, period] = courseKey.split('-');
+    
+    // 创建编辑备注的模态框
+    
+    // 创建新的模态框元素，避免ID冲突
+    const editNoteModal = document.createElement('div');
+    editNoteModal.className = 'modal';
+    editNoteModal.style.display = 'flex';
+    editNoteModal.id = 'editNoteModal'; // 添加ID以便识别
+    
+    editNoteModal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑备注</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="editNoteForm">
+                <div class="form-group">
+                    <label for="editNoteContent">备注内容</label>
+                    <textarea id="editNoteContent" rows="4" style="width: 100%;">${note.content}</textarea>
+                </div>
+                
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label for="editNoteTime">上课时间</label>
+                        <select id="editNoteTime">
+                            ${periodSettings.map((period, index) => 
+                                `<option value="${index + 1}" ${parseInt(period) === index + 1 ? 'selected' : ''}>
+                                    ${period.name} (${period.time})
+                                </option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    
+                    <div style="flex: 1;">
+                        <label for="editNoteDay">星期</label>
+                        <select id="editNoteDay">
+                            <option value="1" ${parseInt(day) === 1 ? 'selected' : ''}>周一</option>
+                            <option value="2" ${parseInt(day) === 2 ? 'selected' : ''}>周二</option>
+                            <option value="3" ${parseInt(day) === 3 ? 'selected' : ''}>周三</option>
+                            <option value="4" ${parseInt(day) === 4 ? 'selected' : ''}>周四</option>
+                            <option value="5" ${parseInt(day) === 5 ? 'selected' : ''}>周五</option>
+                            <option value="6" ${parseInt(day) === 6 ? 'selected' : ''}>周六</option>
+                            <option value="7" ${parseInt(day) === 7 ? 'selected' : ''}>周日</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 新增：添加时间戳编辑字段 -->
+                <div class="form-group">
+                    <label for="editNoteTimestamp">日期时间</label>
+                    <input type="text" id="editNoteTimestamp" value="${note.timestamp || new Date().toLocaleString()}" placeholder="格式: YYYY/MM/DD HH:mm:ss">
+                    <small>请输入有效日期时间格式，例如: 2023/12/25 14:30:00</small>
+                </div>
+                
+                <div class="edit-note-form-actions">
+                    <div class="left-buttons">
+                        <button type="button" class="btn-danger" id="deleteEditNoteBtn">删除</button>
+                    </div>
+                    <div class="right-buttons">
+                        <button type="button" class="btn-secondary" id="cancelEditNoteBtn">取消</button>
+                        <button type="submit">保存</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(editNoteModal);
+    
+    // 绑定事件
+    const closeBtn = editNoteModal.querySelector('.close-btn');
+    const cancelBtn = document.getElementById('cancelEditNoteBtn');
+    const deleteBtn = document.getElementById('deleteEditNoteBtn');
+    const editNoteForm = document.getElementById('editNoteForm');
+    
+    // 修改关闭逻辑，使其返回到课程编辑界面而不是直接关闭
+    const closeModal = () => {
+        document.body.removeChild(editNoteModal);
+        // 显示课程编辑模态框（如果存在）
+        const courseModal = document.getElementById('courseModal');
+        if (courseModal) {
+            courseModal.style.display = 'flex';
+        }
+    };
+    
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    
+    deleteBtn.addEventListener('click', () => {
+        if (confirm('确定要删除这条备注吗？')) {
+            scheduleData[courseKey].notes.splice(noteIndex, 1);
+            if (scheduleData[courseKey].notes.length > 0) {
+                const latestNote = scheduleData[courseKey].notes[scheduleData[courseKey].notes.length - 1];
+                scheduleData[courseKey].note = latestNote.content;
+            } else {
+                delete scheduleData[courseKey].note;
+            }
+            saveScheduleData();
+            generateScheduleTable();
+            
+            // 更新备注历史显示 - 修复: 正确更新当前课程的备注历史
+            const currentDay = document.getElementById('editDay').value;
+            const currentPeriod = document.getElementById('editPeriod').value;
+            const currentCourseKey = `${currentDay}-${currentPeriod}`;
+            updateNotesHistory(currentCourseKey);
+            
+            closeModal();
+        }
+    });
+    
+    // 修复：正确设置节次和星期的默认值
+    const editNoteTime = document.getElementById('editNoteTime');
+    const editNoteDay = document.getElementById('editNoteDay');
+    
+    // 设置当前节次和星期的选中状态
+    editNoteTime.value = period;
+    editNoteDay.value = day;
+    
+    editNoteForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newContent = document.getElementById('editNoteContent').value;
+        const newDay = document.getElementById('editNoteDay').value;
+        const newPeriod = document.getElementById('editNoteTime').value;
+        const newTimestamp = document.getElementById('editNoteTimestamp').value;
+        const newCourseKey = `${newDay}-${newPeriod}`;
+
+        // 验证时间戳格式
+        if (newTimestamp && !isValidDateTimeFormat(newTimestamp)) {
+            alert('请输入有效的日期时间格式，例如: 2023/12/25 14:30:00');
+            return;
+        }
+
+        if (newCourseKey !== courseKey) {
+            // 移动备注到新位置
+            if (!scheduleData[newCourseKey]) {
+                scheduleData[newCourseKey] = {
+                    name: `课程${newDay}-${newPeriod}`,
+                    location: '',
+                    teacher: '',
+                    notes: []
+                };
+            }
+
+            scheduleData[newCourseKey].notes = scheduleData[newCourseKey].notes || [];
+            scheduleData[newCourseKey].notes.push({
+                content: newContent,
+                timestamp: newTimestamp || note.timestamp
+            });
+
+            // 更新新位置的 note 字段
+            scheduleData[newCourseKey].note = newContent;
+
+            // 从原位置删除备注
+            scheduleData[courseKey].notes.splice(noteIndex, 1);
+
+            // 更新原位置的 note 字段
+            if (scheduleData[courseKey].notes.length > 0) {
+                const latestNote = scheduleData[courseKey].notes[scheduleData[courseKey].notes.length - 1];
+                scheduleData[courseKey].note = latestNote.content;
+            } else {
+                delete scheduleData[courseKey].note;
+            }
+        } else {
+            // 同位置修改备注
+            scheduleData[courseKey].notes[noteIndex].content = newContent;
+            if (newTimestamp) {
+                scheduleData[courseKey].notes[noteIndex].timestamp = newTimestamp;
+            }
+            scheduleData[courseKey].note = newContent;
+        }
+
+        // 保存数据
+        saveScheduleData();
+
+        // 更新界面
+        generateScheduleTable(); // 重新生成整个表格
+        
+        // 更新备注历史显示 - 修复: 正确更新当前课程的备注历史
+        const currentDay = document.getElementById('editDay').value;
+        const currentPeriod = document.getElementById('editPeriod').value;
+        const currentCourseKey = `${currentDay}-${currentPeriod}`;
+        
+        updateNotesHistory(currentCourseKey);
+        if (newCourseKey !== courseKey) {
+            updateNotesHistory(newCourseKey);
+        }
+
+        closeModal();
+    });
+
+}
+
+// 删除备注
+function deleteNote(courseKey, noteIndex) {
+    if (confirm('确定要删除这条备注吗？')) {
+        scheduleData[courseKey].notes.splice(noteIndex, 1);
+        // 如果删除的是最后一条备注，更新当前显示的备注
+        if (scheduleData[courseKey].notes.length > 0) {
+            const latestNote = scheduleData[courseKey].notes[scheduleData[courseKey].notes.length - 1];
+            scheduleData[courseKey].note = latestNote.content;
+        } else {
+            delete scheduleData[courseKey].note;
+        }
+        saveScheduleData();
+        generateScheduleTable();
+        updateNotesHistory(courseKey);
+    }
+}
+
+// 新增：验证日期时间格式的函数
+function isValidDateTimeFormat(dateTimeStr) {
+    // 支持格式如: 2023/12/25 14:30:00 或 2023-12-25 14:30:00 或 2023/12/25 14:30 或 2023-12-25 14:30
+    const regexWithSeconds = /^\d{4}[\/\-]\d{2}[\/\-]\d{2} \d{2}:\d{2}:\d{2}$/;
+    const regexWithoutSeconds = /^\d{4}[\/\-]\d{2}[\/\-]\d{2} \d{2}:\d{2}$/;
+    // 新增：支持单位数月份和日期的格式
+    const regexWithSingleDigits = /^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2} \d{1,2}:\d{2}(:\d{2})?$/;
+    return regexWithSeconds.test(dateTimeStr) || regexWithoutSeconds.test(dateTimeStr) || regexWithSingleDigits.test(dateTimeStr);
+}
+
+// 新增：格式化日期时间的函数，自动补零
+function formatDateTime(dateTimeStr) {
+    // 尝试解析日期时间字符串
+    const date = new Date(dateTimeStr);
+    if (isNaN(date.getTime())) {
+        // 如果无法解析，尝试手动解析
+        const parts = dateTimeStr.split(' ');
+        if (parts.length === 2) {
+            const datePart = parts[0].split(/[-\/]/);
+            const timePart = parts[1].split(':');
+            
+            if (datePart.length === 3 && (timePart.length === 2 || timePart.length === 3)) {
+                const year = datePart[0];
+                const month = datePart[1].padStart(2, '0');
+                const day = datePart[2].padStart(2, '0');
+                const hour = timePart[0].padStart(2, '0');
+                const minute = timePart[1].padStart(2, '0');
+                const second = timePart[2] ? timePart[2].padStart(2, '0') : '00';
+                
+                if (timePart.length === 2) {
+                    return `${year}/${month}/${day} ${hour}:${minute}`;
+                } else {
+                    return `${year}/${month}/${day} ${hour}:${minute}:${second}`;
+                }
+            }
+        }
+        return dateTimeStr; // 如果无法解析，返回原始字符串
+    }
+    
+    // 如果能正常解析，格式化为标准格式
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+    const second = String(date.getSeconds()).padStart(2, '0');
+    
+    // 检查原始字符串是否包含秒
+    if (dateTimeStr.includes(':') && dateTimeStr.split(':')[2]) {
+        return `${year}/${month}/${day} ${hour}:${minute}:${second}`;
+    } else {
+        return `${year}/${month}/${day} ${hour}:${minute}`;
     }
 }
