@@ -241,6 +241,10 @@ th {
     background: #e74c3c;
 }
 
+.delete-note-btn {
+    background: #e74c3c;
+}
+
 .btn-danger:hover {
     background: #c0392b;
 }
@@ -365,12 +369,34 @@ th {
 
 .note-item-actions {
     margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .note-item-actions button {
     padding: 2px 8px;
     font-size: 12px;
-    margin-right: 5px;
+    border-radius: 4px;
+    border: none;
+    color: white;
+}
+
+/* 删除按钮样式（靠左，红色背景） */
+.note-item-actions .btn-danger {
+    background-color: #e74c3c;
+    margin-right: auto;
+}
+
+/* 编辑按钮样式（靠右） */
+.note-item-actions .btn-edit {
+    background-color: #3498db;
+    margin-left: auto;
+}
+
+/* 悬停效果 */
+.note-item-actions button:hover {
+    opacity: 0.8;
 }
 
 /* 新增：备注历史区域样式修改 */

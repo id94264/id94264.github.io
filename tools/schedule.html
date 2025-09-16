@@ -8,9 +8,10 @@
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#3498db">
     <meta name="description" content="课程表工具，支持个性化课程安排">
-    <link rel="manifest" href="../manifest.json">
-    <link rel="icon" href="../icons/icon-192x192.png" sizes="192x192" type="image/png">
-    <link rel="apple-touch-icon" href="../icons/icon-192x192.png">
+    <!-- 修复manifest.json路径 -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icons/icon-192x192.png" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="课程表">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -176,9 +177,10 @@
     
     <!-- PWA Service Worker Registration -->
     <script>
+        // 修复Service Worker注册路径
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('../sw.js')
+                navigator.serviceWorker.register('/sw.js')
                 .then(function(registration) {
                     console.log('ServiceWorker registration successful with scope: ', registration.scope);
                 })
