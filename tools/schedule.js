@@ -867,8 +867,8 @@ function editNote(courseKey, noteIndex) {
                 </div>
                 
                 <div class="form-actions">
+                <button type="button" class="btn-danger" id="deleteEditNoteBtn">删除</button>
                     <button type="button" class="btn-secondary" id="cancelEditNoteBtn">取消</button>
-                    <button type="button" class="btn-danger" id="deleteEditNoteBtn">删除</button>
                     <button type="submit">保存</button>
                 </div>
             </form>
