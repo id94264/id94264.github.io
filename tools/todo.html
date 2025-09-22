@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do 列表</title>
+    <link rel="stylesheet" href="todo.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>To Do 列表</h1>
+        </header>
+        
+        <div class="main-content">
+            <aside class="sidebar">
+                <ul id="categories">
+                    <li data-category="all" class="active">我的任务</li>
+                </ul>
+                <button id="add-category-btn">+ 添加分类</button>
+            </aside>
+            
+            <main class="task-list">
+                <!-- 任务列表将在这里动态生成 -->
+            </main>
+        </div>
+    </div>
+    
+    <!-- 悬浮添加按钮 -->
+    <div class="floating-button" id="add-task-button">
+        +
+    </div>
+    
+    <!-- 悬浮设置按钮 -->
+    <div class="settings-button" id="settings-button">⚙</div>
+    
+    <!-- 添加任务弹窗 -->
+    <div class="modal" id="add-task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加任务</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="add-task-form">
+                <div class="form-group">
+                    <label for="task-title">标题 *</label>
+                    <input type="text" id="task-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-category">分类</label>
+                    <select id="task-category" class="task-category-select">
+                        <option value="all">我的任务</option>
+                        <option value="planned">已计划</option>
+                        <option value="assigned">已分配给我</option>
+                        <option value="important">重要</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-content">内容</label>
+                    <textarea id="task-content"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-images">图片</label>
+                    <input type="file" id="task-images" accept="image/*" multiple>
+                    <div class="image-preview" id="image-preview"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-save">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 新增: 隐藏的替换图片文件输入框 -->
+    <input type="file" id="replace-image-input" accept="image/*" style="display: none;">
+
+    <!-- 编辑任务弹窗 -->
+    <div class="modal" id="edit-task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑任务</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="edit-task-form">
+                <input type="hidden" id="edit-task-id">
+                <div class="form-group">
+                    <label for="edit-task-title">标题 *</label>
+                    <input type="text" id="edit-task-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-task-category">分类</label>
+                    <select id="edit-task-category" class="task-category-select">
+                        <option value="all">我的任务</option>
+                        <option value="planned">已计划</option>
+                        <option value="assigned">已分配给我</option>
+                        <option value="important">重要</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-task-content">内容</label>
+                    <textarea id="edit-task-content"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-task-images">图片</label>
+                    <input type="file" id="edit-task-images" accept="image/*" multiple>
+                    <div class="image-preview" id="edit-image-preview"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-save">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 任务详情弹窗 -->
+    <div class="modal task-detail-modal" id="task-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="task-detail-title">任务详情</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="task-detail-content" id="task-detail-content"></div>
+            <div class="task-detail-images" id="task-detail-images"></div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" id="close-detail-button">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 设置弹窗 -->
+    <div class="modal settings-modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>设置</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="settings-actions">
+                <button id="import-btn">导入任务</button>
+                <button id="export-btn">导出任务</button>
+                <input type="file" id="file-input" style="display: none;">
+                <button id="settings-general-btn">通用设置</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 重命名分类弹窗 -->
+    <div class="modal" id="rename-category-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>重命名分类</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="rename-category-form">
+                <input type="hidden" id="rename-category-id">
+                <div class="form-group">
+                    <label for="rename-category-name">分类名称</label>
+                    <input type="text" id="rename-category-name" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-save">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="todo.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
