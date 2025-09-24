@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>全屏时钟</title>
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#000000">
-    <meta name="description" content="全屏时钟工具，支持个性化设置">
-    <link rel="manifest" href="../manifest.json">
-    <link rel="icon" href="../icons/icon-192x192.png" sizes="192x192" type="image/png">
-    <link rel="apple-touch-icon" href="../icons/icon-192x192.png">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="全屏时钟">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
         * {
             margin: 0;
@@ -21,610 +12,471 @@
         }
 
         body {
-            background-color: #000;
-            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #000000 100%);
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            transition: all 0.3s;
-            touch-action: manipulation;
+            overflow: hidden;
         }
 
-        #time {
-            font-size: 20vw;
-            font-family: 'Arial', sans-serif;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
-            letter-spacing: -0.05em;
+        .clock-container {
+            text-align: center;
+            color: white;
+            padding: 20px;
         }
 
-        .date-container {
-            display: flex;
-            gap: 4vw;
-            margin-top: 3vh;
-            font-size: 4vw;
+        .time {
+            font-size: 8rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        #settings-button {
+        .date {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        
+        .controls {
             position: fixed;
             top: 20px;
-            right: 20px;
+            left: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
             width: 50px;
             height: 50px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 1001;
-            transition: all 0.3s;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            touch-action: manipulation;
-            font-size: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 500;
-            color: #fff;
-            backdrop-filter: blur(10px);
         }
 
-        #settings-button:hover {
-            background: rgba(255,255,255,0.2);
-            transform: scale(1.1);
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
 
-        #settings-button:active {
-            transform: scale(0.95);
-        }
-
-        #settings-button::before {
-            content: "⚙️";
-            font-size: 24px;
-        }
-
-        #settings-panel {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            padding: 25px;
-            border-radius: 15px;
-            color: #fff;
-            display: none;
-            z-index: 1000;
-            min-width: 300px;
-            border: 1px solid rgba(255,255,255,0.1);
-            max-width: 90vw;
-            width: 400px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        #settings-panel.show {
-            display: block;
-        }
-
-        #overlay {
+        /* 设置面板样式 */
+        .settings-panel {
             position: fixed;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 999;
+            right: -350px;
+            width: 320px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
         }
 
-        .settings-item {
-            margin: 20px 0;
+        .settings-panel.active {
+            right: 0;
         }
 
-        .settings-item label {
+        .settings-panel h3 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+
+        .setting-group h4 {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .setting-item {
+            margin-bottom: 12px;
+        }
+
+        .setting-item label {
             display: block;
-            margin-bottom: 8px;
-            font-size: 16px;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 0.9rem;
         }
 
-        input[type="range"] {
-            width: 100%;
-            height: 8px;
-            background: #444;
-            border-radius: 4px;
-            outline: none;
-            touch-action: pan-y;
-        }
-
-        input[type="color"] {
-            width: 100%;
-            height: 40px;
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-
-        select {
+        .setting-item input, .setting-item select {
             width: 100%;
             padding: 8px;
-            border-radius: 4px;
-            background: #333;
-            color: white;
-            border: 1px solid #555;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
         }
 
-        .close-btn {
+        .close-settings {
             position: absolute;
-            top: 10px;
+            top: 15px;
             right: 15px;
             background: none;
             border: none;
-            color: #fff;
-            font-size: 24px;
+            font-size: 1.5rem;
             cursor: pointer;
+            color: #666;
         }
 
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .settings-header h3 {
-            margin: 0;
-        }
-
-        /* 预设颜色按钮样式 */
-        .preset-colors {
+        .settings-actions {
             display: flex;
             gap: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
+            margin-top: 20px;
         }
 
-        .preset-color-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .preset-color-btn:hover {
-            transform: scale(1.2);
-        }
-
-        .preset-color-btn.active {
-            border: 2px solid #fff;
-            box-shadow: 0 0 0 2px #00aaff;
-        }
-
-        .more-colors-btn {
-            background: #333;
-            color: white;
-            border: 1px solid #555;
-            padding: 3px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 5px;
-            width: auto;
-            font-size: 14px;
-            display: inline-block;
-        }
-
-        .more-colors-btn:hover {
-            background: #444;
-        }
-
-        .more-colors-btn.active {
-            box-shadow: 0 0 0 2px #00aaff;
-        }
-
-        .color-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .color-controls .preset-colors {
+        .settings-actions .btn {
             flex: 1;
-            margin-bottom: 0;
+            padding: 12px;
         }
 
-        .color-picker-container {
-            position: fixed; /* 改为固定定位 */
-            z-index: 1002;
-            display: none;
-        }
-
-        .color-picker-container.show {
-            display: block;
-        }
-
-        @media (hover: none) {
-            #settings-button:hover {
-                transform: none;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #time {
-                font-size: 15vw;
+        @media (max-width: 768px) {
+            .time {
+                font-size: 4rem;
             }
             
-            .date-container {
-                font-size: 5vw;
-                flex-direction: column;
-                align-items: center;
-                gap: 1vh;
+            .date {
+                font-size: 1.5rem;
             }
             
-            #settings-panel {
-                width: 90%;
-                padding: 15px;
+            .settings-panel {
+                width: 100%;
+                right: -100%;
             }
         }
     </style>
 </head>
 <body>
-    <div id="time"></div>
-    <div class="date-container">
-        <div id="date"></div>
-        <div id="weekday"></div>
+    <div class="clock-container">
+        <div class="time" id="time">00:00:00</div>
+        <div class="date" id="date">2023年1月1日 星期一</div>
+    </div>
+    
+    <div class="controls">
+        <button class="btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button class="btn" id="settingsBtn" title="设置">⚙️</button>
+        <!-- 删除:<button class="btn" id="backBtn">返回首页</button> -->
     </div>
 
-    <button id="settings-button" aria-label="设置"></button>
-    <div id="overlay" onclick="closeSettings()"></div>
-    
-    <div id="settings-panel">
-        <div class="settings-header">
-            <h3>显示设置</h3>
-            <button class="close-btn" onclick="closeSettings()">×</button>
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settingsPanel">
+        <button class="close-settings" id="closeSettings">&times;</button>
+        <h3>时钟设置</h3>
+        
+        <!-- 时间设置 -->
+        <div class="setting-group">
+            <h4>时间显示设置</h4>
+            <div class="setting-item">
+                <label for="timeFontSize">字体大小 (rem)</label>
+                <input type="number" id="timeFontSize" min="1" max="20" step="0.5" value="8">
+            </div>
+            <div class="setting-item">
+                <label for="timeColor">字体颜色</label>
+                <input type="color" id="timeColor" value="#ffffff">
+            </div>
+            <div class="setting-item">
+                <label for="timeFontWeight">字体粗细</label>
+                <select id="timeFontWeight">
+                    <option value="100">细体 (100)</option>
+                    <option value="200">较细 (200)</option>
+                    <option value="300" selected>正常 (300)</option>
+                    <option value="400">中等 (400)</option>
+                    <option value="500">粗体 (500)</option>
+                    <option value="600">较粗 (600)</option>
+                    <option value="700">加粗 (700)</option>
+                </select>
+            </div>
         </div>
         
-        <div class="settings-item">
-            <label>时间字号 (<span id="timeSizeValue">20</span>vw)</label>
-            <input type="range" id="timeFontSize" min="10" max="60" value="20">
-        </div>
-
-        <div class="settings-item">
-            <label>日期字号 (<span id="dateSizeValue">4</span>vw)</label>
-            <input type="range" id="dateFontSize" min="2" max="15" value="4">
-        </div>
-
-        <div class="settings-item">
-            <label>文字颜色</label>
-            <div class="color-controls">
-                <div class="preset-colors">
-                    <div class="preset-color-btn" style="background-color: #ffffff;" data-color="#ffffff"></div>
-                    <div class="preset-color-btn" style="background-color: #000000;" data-color="#000000"></div>
-                    <div class="preset-color-btn" style="background-color: #ff0000;" data-color="#ff0000"></div>
-                    <div class="preset-color-btn" style="background-color: #00ff00;" data-color="#00ff00"></div>
-                    <div class="preset-color-btn" style="background-color: #0000ff;" data-color="#0000ff"></div>
-                    <div class="preset-color-btn" style="background-color: #ffff00;" data-color="#ffff00"></div>
-                </div>
-                <button class="more-colors-btn" id="moreTextColorBtn">更多</button>
-                <div class="color-picker-container" id="textColorPickerContainer">
-                    <input type="color" id="textColor" value="#ffffff">
-                </div>
+        <!-- 日期设置 -->
+        <div class="setting-group">
+            <h4>日期显示设置</h4>
+            <div class="setting-item">
+                <label for="dateFontSize">字体大小 (rem)</label>
+                <input type="number" id="dateFontSize" min="1" max="10" step="0.5" value="2">
+            </div>
+            <div class="setting-item">
+                <label for="dateColor">字体颜色</label>
+                <input type="color" id="dateColor" value="#ffffff">
+            </div>
+            <div class="setting-item">
+                <label for="dateFontWeight">字体粗细</label>
+                <select id="dateFontWeight">
+                    <option value="100">细体 (100)</option>
+                    <option value="200">较细 (200)</option>
+                    <option value="300" selected>正常 (300)</option>
+                    <option value="400">中等 (400)</option>
+                    <option value="500">粗体 (500)</option>
+                    <option value="600">较粗 (600)</option>
+                    <option value="700">加粗 (700)</option>
+                </select>
             </div>
         </div>
-
-        <div class="settings-item">
-            <label>背景颜色</label>
-            <div class="color-controls">
-                <div class="preset-colors">
-                    <div class="preset-color-btn" style="background-color: #ffffff;" data-color="#ffffff"></div>
-                    <div class="preset-color-btn" style="background-color: #000000;" data-color="#000000"></div>
-                    <div class="preset-color-btn" style="background-color: #ff0000;" data-color="#ff0000"></div>
-                    <div class="preset-color-btn" style="background-color: #00ff00;" data-color="#00ff00"></div>
-                    <div class="preset-color-btn" style="background-color: #0000ff;" data-color="#0000ff"></div>
-                    <div class="preset-color-btn" style="background-color: #ffff00;" data-color="#ffff00"></div>
-                </div>
-                <button class="more-colors-btn" id="moreBgColorBtn">更多</button>
-                <div class="color-picker-container" id="bgColorPickerContainer">
-                    <input type="color" id="bgColor" value="#000000">
-                </div>
+        
+        <!-- 背景设置 -->
+        <div class="setting-group">
+            <h4>背景设置</h4>
+            <div class="setting-item">
+                <label for="bgColor1">背景渐变色1</label>
+                <input type="color" id="bgColor1" value="#667eea">
+            </div>
+            <div class="setting-item">
+                <label for="bgColor2">背景渐变色2</label>
+                <input type="color" id="bgColor2" value="#764ba2">
             </div>
         </div>
-
-        <!-- 删除:        <div class="settings-item">
-            <label>日期格式</label>
-            <select id="dateFormat">
-                <option value="zh">中文格式 (2023年12月25日)</option>
-                <option value="en">英文格式 (Dec 25, 2023)</option>
-                <option value="iso">ISO格式 (2023-12-25)</option>
-            </select>
-        </div> -->
+        
+        <div class="settings-actions">
+            <button class="btn" id="resetSettings" style="color: #333;">恢复默认</button>
+            <button class="btn" id="cancelSettings" style="color: #333;">取消</button>
+            <button class="btn" id="saveSettings" style="color: #333;">保存设置</button>
+        </div>
     </div>
 
     <script>
-        // 全局变量
-        let currentTimezone = 'Asia/Shanghai';
+        // 默认设置
+        const defaultSettings = {
+            timeFontSize: 8,
+            timeColor: '#ffffff',
+            timeFontWeight: '300',
+            dateFontSize: 2,
+            dateColor: '#ffffff',
+            dateFontWeight: '300',
+            bgColor1: '#000000',
+            bgColor2: '#000000'
+        };
 
-        // 时间更新
+        // 保存当前应用的设置的副本
+        let currentAppliedSettings = {...defaultSettings};
+        // 保存打开设置面板时的设置副本，用于取消时恢复
+        let settingsAtOpen = {...defaultSettings};
+
+        // 应用设置
+        function applySettings(settings) {
+            // 应用时间样式
+            document.querySelector('.time').style.fontSize = settings.timeFontSize + 'rem';
+            document.querySelector('.time').style.color = settings.timeColor;
+            document.querySelector('.time').style.fontWeight = settings.timeFontWeight;
+            
+            // 应用日期样式
+            document.querySelector('.date').style.fontSize = settings.dateFontSize + 'rem';
+            document.querySelector('.date').style.color = settings.dateColor;
+            document.querySelector('.date').style.fontWeight = settings.dateFontWeight;
+            
+            // 应用背景样式
+            document.body.style.background = `linear-gradient(135deg, ${settings.bgColor1} 0%, ${settings.bgColor2} 100%)`;
+            
+            // 保存当前应用的设置
+            currentAppliedSettings = {...settings};
+        }
+
+        // 实时预览设置
+        function previewSettings() {
+            const settings = {
+                timeFontSize: parseFloat(document.getElementById('timeFontSize').value),
+                timeColor: document.getElementById('timeColor').value,
+                timeFontWeight: document.getElementById('timeFontWeight').value,
+                dateFontSize: parseFloat(document.getElementById('dateFontSize').value),
+                dateColor: document.getElementById('dateColor').value,
+                dateFontWeight: document.getElementById('dateFontWeight').value,
+                bgColor1: document.getElementById('bgColor1').value,
+                bgColor2: document.getElementById('bgColor2').value
+            };
+            applySettings(settings);
+        }
+
+        // 保存设置到本地存储
+        function saveSettingsToStorage(settings) {
+            localStorage.setItem('clockSettings', JSON.stringify(settings));
+        }
+
+        // 从本地存储获取设置
+        function getSettingsFromStorage() {
+            const settings = localStorage.getItem('clockSettings');
+            return settings ? JSON.parse(settings) : null;
+        }
+
+        // 加载设置
+        function loadSettings() {
+            const savedSettings = getSettingsFromStorage();
+            if (savedSettings) {
+                applySettings(savedSettings);
+                // 更新设置面板的值
+                document.getElementById('timeFontSize').value = savedSettings.timeFontSize;
+                document.getElementById('timeColor').value = savedSettings.timeColor;
+                document.getElementById('timeFontWeight').value = savedSettings.timeFontWeight;
+                document.getElementById('dateFontSize').value = savedSettings.dateFontSize;
+                document.getElementById('dateColor').value = savedSettings.dateColor;
+                document.getElementById('dateFontWeight').value = savedSettings.dateFontWeight;
+                document.getElementById('bgColor1').value = savedSettings.bgColor1;
+                document.getElementById('bgColor2').value = savedSettings.bgColor2;
+            } else {
+                // 应用默认设置
+                applySettings(defaultSettings);
+            }
+        }
+
+        // 更新时间函数
         function updateTime() {
             const now = new Date();
             
-            // 根据时区获取时间
-            const timeOptions = { 
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                timeZone: currentTimezone
+            // 格式化时间
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // 格式化日期
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            
+            // 星期几
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekday = weekdays[now.getDay()];
+            
+            document.getElementById('date').textContent = `${year}年${month}月${day}日 ${weekday}`;
+        }
+
+        // 初始调用
+        updateTime();
+        
+        // 每秒更新一次时间
+        setInterval(updateTime, 1000);
+
+        // 全屏功能
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            // 检查当前是否处于全屏状态
+            if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+                // 如果是全屏状态，则退出全屏
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            } else {
+                // 如果不是全屏状态，则进入全屏
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            }
+        });
+
+        // 修改:设置按钮切换功能
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            const settingsPanel = document.getElementById('settingsPanel');
+            // 打开设置面板前保存当前设置
+            settingsAtOpen = {...currentAppliedSettings};
+            // 更新面板中的值
+            document.getElementById('timeFontSize').value = settingsAtOpen.timeFontSize;
+            document.getElementById('timeColor').value = settingsAtOpen.timeColor;
+            document.getElementById('timeFontWeight').value = settingsAtOpen.timeFontWeight;
+            document.getElementById('dateFontSize').value = settingsAtOpen.dateFontSize;
+            document.getElementById('dateColor').value = settingsAtOpen.dateColor;
+            document.getElementById('dateFontWeight').value = settingsAtOpen.dateFontWeight;
+            document.getElementById('bgColor1').value = settingsAtOpen.bgColor1;
+            document.getElementById('bgColor2').value = settingsAtOpen.bgColor2;
+            settingsPanel.classList.toggle('active');
+        });
+
+        // 关闭设置面板
+        document.getElementById('closeSettings').addEventListener('click', () => {
+            // 恢复到打开设置面板时的设置
+            applySettings(settingsAtOpen);
+            document.getElementById('settingsPanel').classList.remove('active');
+        });
+
+        // 保存设置
+        document.getElementById('saveSettings').addEventListener('click', () => {
+            const settings = {
+                timeFontSize: parseFloat(document.getElementById('timeFontSize').value),
+                timeColor: document.getElementById('timeColor').value,
+                timeFontWeight: document.getElementById('timeFontWeight').value,
+                dateFontSize: parseFloat(document.getElementById('dateFontSize').value),
+                dateColor: document.getElementById('dateColor').value,
+                dateFontWeight: document.getElementById('dateFontWeight').value,
+                bgColor1: document.getElementById('bgColor1').value,
+                bgColor2: document.getElementById('bgColor2').value
             };
             
-            document.getElementById('time').textContent = now.toLocaleTimeString('zh-CN', timeOptions);
-            
-            // 固定使用中文日期格式
-            
-            // 使用固定的中文日期格式
-            const dateStr = now.toLocaleDateString('zh-CN', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                timeZone: currentTimezone 
-            });
-            const weekdayStr = now.toLocaleDateString('zh-CN', { weekday: 'long', timeZone: currentTimezone });
-            
-            document.getElementById('date').textContent = dateStr;
-            document.getElementById('weekday').textContent = weekdayStr;
-        }
-
-        // 设置面板控制
-        const settingsButton = document.getElementById('settings-button');
-        const settingsPanel = document.getElementById('settings-panel');
-        const overlay = document.getElementById('overlay');
-
-        function toggleSettings() {
-            settingsPanel.classList.toggle('show');
-            overlay.classList.toggle('show');
-            if (settingsPanel.classList.contains('show')) {
-                syncSettings();
-            }
-        }
-
-        function closeSettings() {
-            settingsPanel.classList.remove('show');
-            overlay.classList.remove('show');
-            // 隐藏颜色选择器
-            document.getElementById('textColorPickerContainer').classList.remove('show');
-            document.getElementById('bgColorPickerContainer').classList.remove('show');
-        }
-
-        // 核心修复：正确转换vw值
-        function getCurrentVwSize(element, defaultValue) {
-            const viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-            const pxSize = parseFloat(getComputedStyle(element).fontSize);
-            return viewportWidth > 0 ? Math.round((pxSize / viewportWidth) * 100) : defaultValue;
-        }
-
-        // 同步设置
-        function syncSettings() {
-            // 时间字号
-            const timeVw = getCurrentVwSize(document.getElementById('time'), 20);
-            document.getElementById('timeFontSize').value = timeVw;
-            document.getElementById('timeSizeValue').textContent = timeVw;
-
-            // 日期字号
-            const dateVw = getCurrentVwSize(document.querySelector('.date-container'), 4);
-            document.getElementById('dateFontSize').value = dateVw;
-            document.getElementById('dateSizeValue').textContent = dateVw;
-
-            // 颜色设置
-            const textColorValue = rgbToHex(getComputedStyle(document.body).color) || '#ffffff';
-            const bgColorValue = rgbToHex(getComputedStyle(document.body).backgroundColor) || '#000000';
-            
-            document.getElementById('textColor').value = textColorValue;
-            document.getElementById('bgColor').value = bgColorValue;
-            
-            // 更新预设颜色按钮的激活状态
-            updatePresetColorButtons('text', textColorValue);
-            updatePresetColorButtons('bg', bgColorValue);
-            
-        }
-
-        // 更新预设颜色按钮的激活状态
-        function updatePresetColorButtons(type, color) {
-            // 修复：使用更精确的选择器定位对应的颜色设置项
-            const section = type === 'text' ? 
-                document.querySelector('.settings-item:nth-child(3)') : 
-                document.querySelector('.settings-item:nth-child(4)');
-            
-            const moreBtn = section.querySelector('.more-colors-btn');
-            const buttons = section.querySelectorAll('.preset-color-btn');
-            
-            // 先移除所有激活状态
-            buttons.forEach(btn => btn.classList.remove('active'));
-            moreBtn.classList.remove('active');
-            
-            // 标准化颜色值比较
-            const targetColor = color.toLowerCase().trim();
-            let found = false;
-            
-            buttons.forEach(btn => {
-                const presetColor = btn.getAttribute('data-color').toLowerCase().trim();
-                if (presetColor === targetColor) {
-                    btn.classList.add('active');
-                    found = true;
-                }
-            });
-            
-            // 如果预设中没有匹配项，则激活"更多"按钮
-            if (!found) {
-                moreBtn.classList.add('active');
-            }
-        }
-
-        // RGB转HEX（增强兼容性）
-        function rgbToHex(rgb) {
-            // 处理HEX直接返回
-            if (rgb.startsWith('#')) return rgb;
-            
-            // 创建临时div获取标准RGB值
-            const div = document.createElement('div');
-            div.style.backgroundColor = rgb;
-            document.body.appendChild(div);
-            const computed = getComputedStyle(div).backgroundColor;
-            document.body.removeChild(div);
-            
-            // 解析RGB值
-            const matches = computed.match(/^rgb$$(\d+),\s*(\d+),\s*(\d+)$$/);
-            if (!matches) return '#000000';
-            
-            const hex = (x) => ("0" + parseInt(x).toString(16)).slice(-2);
-            return '#' + hex(matches[1]) + hex(matches[2]) + hex(matches[3]);
-        }
-
-        // 初始化元素引用
-        const timeFontSize = document.getElementById('timeFontSize');
-        const dateFontSize = document.getElementById('dateFontSize');
-        const textColor = document.getElementById('textColor');
-        const bgColor = document.getElementById('bgColor');
-
-        // 事件监听
-        settingsButton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            toggleSettings();
+            applySettings(settings);
+            saveSettingsToStorage(settings);
+            document.getElementById('settingsPanel').classList.remove('active');
         });
 
-        // 统一输入处理
-        function handleInput() {
-            document.getElementById('time').style.fontSize = `${timeFontSize.value}vw`;
-            document.querySelector('.date-container').style.fontSize = `${dateFontSize.value}vw`;
-            document.body.style.color = textColor.value;
-            document.body.style.backgroundColor = bgColor.value;
+        // 恢复默认设置
+        document.getElementById('resetSettings').addEventListener('click', () => {
+            applySettings(defaultSettings);
+            saveSettingsToStorage(defaultSettings);
             
-            // 实时更新显示值
-            document.getElementById('timeSizeValue').textContent = timeFontSize.value;
-            document.getElementById('dateSizeValue').textContent = dateFontSize.value;
-            
-            // 更新预设颜色按钮状态
-            updatePresetColorButtons('text', textColor.value);
-            updatePresetColorButtons('bg', bgColor.value);
-            
-        }
-
-        // 绑定事件
-        [timeFontSize, dateFontSize, textColor, bgColor].forEach(element => {
-            element.addEventListener('input', handleInput);
+            // 更新设置面板的值
+            document.getElementById('timeFontSize').value = defaultSettings.timeFontSize;
+            document.getElementById('timeColor').value = defaultSettings.timeColor;
+            document.getElementById('timeFontWeight').value = defaultSettings.timeFontWeight;
+            document.getElementById('dateFontSize').value = defaultSettings.dateFontSize;
+            document.getElementById('dateColor').value = defaultSettings.dateColor;
+            document.getElementById('dateFontWeight').value = defaultSettings.dateFontWeight;
+            document.getElementById('bgColor1').value = defaultSettings.bgColor1;
+            document.getElementById('bgColor2').value = defaultSettings.bgColor2;
         });
 
-        // 窗口大小变化监听（可选）
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                if (settingsPanel.classList.contains('show')) {
-                    syncSettings();
-                }
-            }, 200);
+        // 取消设置 - 恢复到应用前的设置
+        document.getElementById('cancelSettings').addEventListener('click', () => {
+            // 恢复到打开设置面板时的设置
+            applySettings(settingsAtOpen);
+            document.getElementById('settingsPanel').classList.remove('active');
         });
 
-        // 点击设置面板外部关闭
-        settingsPanel.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
+        // // 删除:返回首页
+        // document.getElementById('backBtn').addEventListener('click', () => {
+        //     window.location.href = '../index.html';
+        // });
 
-        // 预设颜色按钮事件（增强类型判断）
-        document.querySelectorAll('.preset-color-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const color = this.getAttribute('data-color');
-                const parentSection = this.closest('.settings-item');
-                const label = parentSection.querySelector('label').textContent;
-                
-                if (label.includes('文字颜色')) {
-                    document.getElementById('textColor').value = color;
-                    document.body.style.color = color;
-                    updatePresetColorButtons('text', color);
-                } else if (label.includes('背景颜色')) {
-                    document.getElementById('bgColor').value = color;
-                    document.body.style.backgroundColor = color;
-                    updatePresetColorButtons('bg', color);
-                }
-                
-            });
-        });
-
-        // 更多颜色按钮事件
-        document.getElementById('moreTextColorBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            const container = document.getElementById('textColorPickerContainer');
-            const rect = this.getBoundingClientRect();
+        // 页面加载完成后自动更新一次时间并加载设置
+        window.addEventListener('load', () => {
+            updateTime();
+            loadSettings();
             
-            // 设置颜色选择器在按钮右侧
-            container.style.top = rect.top + 'px';
-            container.style.left = (rect.right + 10) + 'px'; // 右侧留10px间距
-            
-            container.classList.toggle('show');
-            
-            if (container.classList.contains('show')) {
-                document.getElementById('textColor').click();
-            }
+            // 添加实时预览事件监听器
+            document.getElementById('timeFontSize').addEventListener('input', previewSettings);
+            document.getElementById('timeColor').addEventListener('input', previewSettings);
+            document.getElementById('timeFontWeight').addEventListener('change', previewSettings);
+            document.getElementById('dateFontSize').addEventListener('input', previewSettings);
+            document.getElementById('dateColor').addEventListener('input', previewSettings);
+            document.getElementById('dateFontWeight').addEventListener('change', previewSettings);
+            document.getElementById('bgColor1').addEventListener('input', previewSettings);
+            document.getElementById('bgColor2').addEventListener('input', previewSettings);
         });
-
-        document.getElementById('moreBgColorBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            const container = document.getElementById('bgColorPickerContainer');
-            const rect = this.getBoundingClientRect();
-            
-            // 设置颜色选择器在按钮右侧
-            container.style.top = rect.top + 'px';
-            container.style.left = (rect.right + 10) + 'px'; // 右侧留10px间距
-            
-            container.classList.toggle('show');
-            
-            if (container.classList.contains('show')) {
-                document.getElementById('bgColor').click();
-            }
-        });
-
-        // 颜色选择器事件
-        textColor.addEventListener('input', function() {
-            document.body.style.color = this.value;
-            updatePresetColorButtons('text', this.value);
-            // 隐藏颜色选择器容器
-            document.getElementById('textColorPickerContainer').classList.remove('show');
-        });
-
-        bgColor.addEventListener('input', function() {
-            document.body.style.backgroundColor = this.value;
-            updatePresetColorButtons('bg', this.value);
-            // 隐藏颜色选择器容器
-            document.getElementById('bgColorPickerContainer').classList.remove('show');
-        });
-
-        // 点击其他地方隐藏颜色选择器
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('#moreTextColorBtn') && !e.target.closest('#textColor')) {
-                document.getElementById('textColorPickerContainer').classList.remove('show');
-            }
-            if (!e.target.closest('#moreBgColorBtn') && !e.target.closest('#bgColor')) {
-                document.getElementById('bgColorPickerContainer').classList.remove('show');
-            }
-        });
-
-        // 初始化执行
-        updateTime();
-        setInterval(updateTime, 1000);
-    </script>
-    
-    <!-- PWA Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('../sw.js')
-                .then(function(registration) {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                })
-                .catch(function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
     </script>
 </body>
 </html>
