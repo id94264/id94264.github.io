@@ -1,12 +1,15 @@
-const CACHE_NAME = 'tools-v1.0';
+const CACHE_NAME = 'tools-v1.1';
 const urlsToCache = [
   '/',
-  '/index.html',
-  '/tools/clock.html',
-  '/tools/schedule.html',
-  '/tools/schedule.css',
-  '/tools/schedule.js',
-  '/manifest.json'
+  '/tools/index.html',
+  '/tools/tools/clock.html',
+  '/tools/tools/schedule.html',
+  '/tools/tools/schedule.css',
+  '/tools/tools/schedule.js',
+  '/tools/tools/todo.html',
+  '/tools/tools/todo.js',
+  '/tools/icon.svg',
+  '/tools/manifest.json'
 ];
 
 // 安装事件 - 缓存资源
