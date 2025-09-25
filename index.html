@@ -8,9 +8,6 @@
     <meta name="theme-color" content="#3498db">
     <meta name="description" content="实用工具合集，包含全屏时钟、课程表等功能">
     <link rel="manifest" href="manifest.json">
-    <!-- Delete:<link rel="icon" href="icons/icon-192x192.png" sizes="192x192" type="image/png"> -->
-    <!-- Delete:<link rel="icon" href="icons/icon-512x512.png" sizes="512x512" type="image/png"> -->
-    <!-- Delete:<link rel="apple-touch-icon" href="icons/icon-192x192.png"> -->
     <link rel="icon" href="icon.svg" type="image/svg+xml">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="工具合集">
@@ -107,9 +104,10 @@
     <!-- PWA Service Worker Registration -->
     <script>
         // 修复Service Worker在file协议下无法注册的问题
-        if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+        if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('./sw.js')
+                // 使用相对路径确保在GitHub Pages上正确注册
+                navigator.serviceWorker.register('/tools/sw.js')
                 .then(function(registration) {
                     console.log('ServiceWorker registration successful with scope: ', registration.scope);
                 })
@@ -145,4 +143,3 @@
     </svg>
 </body>
 </html>
-
