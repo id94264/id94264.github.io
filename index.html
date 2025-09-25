@@ -8,9 +8,10 @@
     <meta name="theme-color" content="#3498db">
     <meta name="description" content="实用工具合集，包含全屏时钟、课程表等功能">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icons/icon-192x192.png" sizes="192x192" type="image/png">
-    <link rel="icon" href="icons/icon-512x512.png" sizes="512x512" type="image/png">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <!-- Delete:<link rel="icon" href="icons/icon-192x192.png" sizes="192x192" type="image/png"> -->
+    <!-- Delete:<link rel="icon" href="icons/icon-512x512.png" sizes="512x512" type="image/png"> -->
+    <!-- Delete:<link rel="apple-touch-icon" href="icons/icon-192x192.png"> -->
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="工具合集">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -100,20 +101,13 @@
                 <h2>✅ To Do</h2>
                 <p>点击进入任务管理，支持本地存储和导入导出</p>
             </div>
-            <div class="tool-card">
-                <h2>📅 日历备忘</h2>
-                <p>待开发的功能...</p>
-            </div>
-            <div class="tool-card">
-                <h2>🧮 计算器</h2>
-                <p>待开发的功能...</p>
-            </div>
         </div>
     </div>
 
     <!-- PWA Service Worker Registration -->
     <script>
-        if ('serviceWorker' in navigator) {
+        // 修复Service Worker在file协议下无法注册的问题
+        if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('./sw.js')
                 .then(function(registration) {
@@ -125,5 +119,30 @@
             });
         }
     </script>
+    
+    <!-- SVG Icons for PWA -->
+    <svg style="display: none;">
+        <symbol id="icon-clock" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+            <polyline points="12,6 12,12 16,14" fill="none" stroke="currentColor" stroke-width="2"/>
+        </symbol>
+        <symbol id="icon-schedule" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>
+            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/>
+            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="8" y1="14" x2="8" y2="16" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="14" x2="12" y2="16" stroke="currentColor" stroke-width="2"/>
+            <line x1="16" y1="14" x2="16" y2="16" stroke="currentColor" stroke-width="2"/>
+        </symbol>
+        <symbol id="icon-todo" viewBox="0 0 24 24">
+            <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2"/>
+            <rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="8" y1="10" x2="8" y2="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="8" y1="14" x2="8" y2="14" stroke="currentColor" stroke-width="2"/>
+            <line x1="8" y1="18" x2="8" y2="18" stroke="currentColor" stroke-width="2"/>
+        </symbol>
+    </svg>
 </body>
 </html>
+
