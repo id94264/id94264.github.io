@@ -6,7 +6,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #f5f5f5;
+    background: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 50%, #f3e5f5 100%);
     padding: 20px;
     color: #333;
 }
@@ -22,8 +22,9 @@ header {
 }
 
 h1 {
-    color: #2c3e50;
+    color: #01579b;
     margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
 .controls {
@@ -35,18 +36,21 @@ h1 {
 }
 
 button {
-    background: #3498db;
+    background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
     color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
-    transition: background 0.3s;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 button:hover {
-    background: #2980b9;
+    background: linear-gradient(135deg, #29b6f6 0%, #039be5 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .schedule-container {
@@ -56,10 +60,12 @@ button:hover {
 }
 
 .schedule-table {
-    background: white;
+    background: rgba(255, 255, 255, 0.7);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(200, 230, 201, 0.5);
 }
 
 table {
@@ -70,18 +76,19 @@ table {
 th, td {
     padding: 15px;
     text-align: center;
-    border: 1px solid #eee;
+    border: 1px solid rgba(200, 230, 201, 0.5);
 }
 
 th {
-    background-color: #3498db;
+    background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
     color: white;
     font-weight: 600;
 }
 
 .time-column {
-    background-color: #f8f9fa;
+    background-color: rgba(232, 245, 233, 0.7);
     font-weight: 600;
+    color: #01579b;
 }
 
 .course-cell {
@@ -89,10 +96,11 @@ th {
     min-height: 60px;
     cursor: pointer;
     transition: background 0.2s;
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .course-cell:hover {
-    background-color: #f0f8ff;
+    background-color: rgba(225, 245, 254, 0.7);
 }
 
 .course-info {
@@ -101,25 +109,25 @@ th {
 
 .course-name {
     font-weight: 600;
-    color: #2c3e50;
+    color: #01579b;
 }
 
 .course-location {
-    color: #7f8c8d;
+    color: #546e7a;
     font-size: 13px;
 }
 
 /* 修改备注样式 */
 .course-note {
-    color: #3498db;
+    color: #29b6f6;
     font-size: 12px;
     margin-top: 3px;
     display: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%; /* 宽度继承父容器 */
-    box-sizing: border-box; /* 包含padding计算宽度 */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .course-cell:hover .course-note {
@@ -135,13 +143,14 @@ th {
     overflow: visible;
     text-overflow: clip;
     max-height: 60px;
+    border-top: 1px solid rgba(200, 230, 201, 0.5);
 }
 
 /* 添加备注列表样式 */
 .notes-list {
     margin-top: 5px;
     padding: 5px;
-    background-color: #f0f8ff;
+    background-color: rgba(225, 245, 254, 0.5);
     border-radius: 4px;
     max-height: 100px;
     overflow-y: auto;
@@ -149,14 +158,14 @@ th {
 
 .note-item {
     padding: 2px 0;
-    border-bottom: 1px solid #e0e0e0;
-    font-size: 14px; /* 增大备注历史文字 */
-    color: #666;
+    border-bottom: 1px solid rgba(200, 230, 201, 0.5);
+    font-size: 14px;
+    color: #37474f;
 }
 
 .note-header {
     font-weight: bold;
-    color: #3498db;
+    color: #29b6f6;
     margin-bottom: 3px;
 }
 
@@ -167,21 +176,23 @@ th {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.3);
     z-index: 1000;
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
-    background: white;
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
     width: 90%;
-    max-width: 700px; /* 增加模态框宽度以适应两栏布局 */
+    max-width: 700px;
     padding: 25px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    max-height: 90vh; /* 限制最大高度 */
-    overflow-y: auto; /* 允许垂直滚动 */
+    max-height: 90vh;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(200, 230, 201, 0.5);
 }
 
 /* 添加两栏布局样式 */
@@ -202,24 +213,33 @@ th {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
+    color: #0277bd;
 }
 
-.form-group input, .form-group select {
+.form-group input, .form-group select, .form-group textarea {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #c8e6c9;
     border-radius: 5px;
     font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.7);
+    box-sizing: border-box;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: #4fc3f7;
+    box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+    outline: none;
 }
 
 /* 修改导入导出按钮样式 */
 #importDataBtn, #exportDataBtn {
-    background: #3498db;
-    margin-bottom: 15px; /* 增加与下方按钮的间距 */
+    background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+    margin-bottom: 15px;
 }
 
 #importDataBtn:hover, #exportDataBtn:hover {
-    background: #2980b9;
+    background: linear-gradient(135deg, #29b6f6 0%, #039be5 100%);
 }
 
 .form-actions {
@@ -230,23 +250,26 @@ th {
 }
 
 .btn-secondary {
-    background: #95a5a6;
+    background: linear-gradient(135deg, #80deea 0%, #4dd0e1 100%);
+    color: white;
 }
 
 .btn-secondary:hover {
-    background: #7f8c8d;
+    background: linear-gradient(135deg, #4dd0e1 0%, #26c6da 100%);
 }
 
 .btn-danger {
-    background: #e74c3c;
+    background: linear-gradient(135deg, #ef5350 0%, #f44336 100%);
+    color: white;
 }
 
 .delete-note-btn {
-    background: #e74c3c;
+    background: #ef5350;
+    color: white;
 }
 
 .btn-danger:hover {
-    background: #c0392b;
+    background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
 }
 
 .empty-cell {
@@ -256,7 +279,7 @@ th {
 
 /* 添加课程按钮样式 */
 .add-course-btn {
-    color: #3498db;
+    color: #29b6f6;
     font-style: normal;
     cursor: pointer;
     padding: 5px 10px;
@@ -265,15 +288,15 @@ th {
 }
 
 .add-course-btn:hover {
-    background-color: #3498db;
+    background-color: #29b6f6;
     color: white;
 }
 
 /* 设置模态框样式 */
 .settings-modal-content {
     max-width: 600px;
-    max-height: 90vh; /* 限制最大高度 */
-    overflow-y: auto; /* 允许垂直滚动 */
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .period-setting {
@@ -285,6 +308,16 @@ th {
 
 .period-setting input {
     flex: 1;
+    padding: 8px;
+    border: 1px solid #c8e6c9;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.period-setting input:focus {
+    border-color: #4fc3f7;
+    box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+    outline: none;
 }
 
 .period-setting .period-name {
@@ -307,26 +340,27 @@ th {
 
 .add-period-btn {
     margin-top: 10px;
-    background: #27ae60;
-    margin-left: auto; /* 靠右对齐 */
+    background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+    color: white;
+    margin-left: auto;
     display: block;
 }
 
 .add-period-btn:hover {
-    background: #229954;
+    background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
 }
 
 /* 添加行背景色样式 */
 .even-row {
-    background-color: #f9f9f9;
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .odd-row {
-    background-color: #ffffff;
+    background-color: rgba(232, 245, 233, 0.5);
 }
 
 .special-period {
-    background-color: #e0e0e0;
+    background-color: rgba(200, 230, 201, 0.5);
 }
 
 /* 修改模态框标题样式，为关闭按钮留出空间 */
@@ -339,6 +373,7 @@ th {
 
 .modal-header h2 {
     margin: 0;
+    color: #01579b;
 }
 
 .close-btn {
@@ -346,13 +381,13 @@ th {
     border: none;
     font-size: 28px;
     cursor: pointer;
-    color: #999;
+    color: #90a4ae;
     padding: 0;
     width: auto;
 }
 
 .close-btn:hover {
-    color: #333;
+    color: #01579b;
 }
 
 /* 增加备注输入框宽度 */
@@ -362,7 +397,7 @@ th {
 
 /* 添加备注提示样式 */
 .note-indicator {
-    color: #3498db;
+    color: #29b6f6;
     font-size: 12px;
     font-weight: bold;
 }
@@ -384,13 +419,13 @@ th {
 
 /* 删除按钮样式（靠左，红色背景） */
 .note-item-actions .btn-danger {
-    background-color: #e74c3c;
+    background-color: #ef5350;
     margin-right: auto;
 }
 
 /* 编辑按钮样式（靠右） */
 .note-item-actions .btn-edit {
-    background-color: #3498db;
+    background-color: #29b6f6;
     margin-left: auto;
 }
 
@@ -401,18 +436,19 @@ th {
 
 /* 新增：备注历史区域样式修改 */
 .notes-history-container {
-    max-height: 400px; /* 从250px增加到400px */
+    max-height: 400px;
     overflow-y: auto;
-    border: 1px solid #ddd;
+    border: 1px solid #c8e6c9;
     padding: 10px;
     border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 /* 新增：备注历史项样式 */
 .note-item {
     margin-bottom: 10px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid rgba(200, 230, 201, 0.5);
 }
 
 /* 新增：日期时间和星期节次同行显示样式 */
@@ -425,17 +461,17 @@ th {
 
 .note-header {
     font-weight: bold;
-    color: #3498db;
+    color: #29b6f6;
 }
 
 .note-period {
-    color: #7f8c8d;
+    color: #546e7a;
 }
 
 /* 新增：备注内容样式 */
 .note-content {
     font-size: 14px;
-    color: #333;
+    color: #37474f;
     margin-bottom: 5px;
 }
 
@@ -513,5 +549,9 @@ th {
     
     button {
         width: 80%;
+    }
+    
+    .form-columns {
+        flex-direction: column;
     }
 }
