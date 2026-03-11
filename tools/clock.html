@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>全屏时钟</title>
+    <!-- 引入数码管字体 DSEG7 和像素字体 Press Start 2P，以及 Orbitron -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -27,7 +30,7 @@
             --date-color: #ffffff;
             --time-weight: 300;
             --date-weight: 300;
-            --time-family: 'Courier New', monospace;
+            --time-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* 默认无衬线 */
             --date-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
@@ -110,10 +113,12 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 20px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom)); /* 防止底部按钮被遮挡 */
             transition: right 0.3s ease;
             overflow-y: auto;
             z-index: 1000;
             box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
 
         .settings-panel.active {
@@ -175,6 +180,7 @@
             display: flex;
             gap: 10px;
             margin-top: 20px;
+            margin-bottom: 10px; /* 增加底部空间 */
             flex-wrap: wrap;
         }
 
@@ -214,7 +220,6 @@
             }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="clock-container">
@@ -227,10 +232,12 @@
         <button class="btn" id="settingsBtn" title="设置">⚙️</button>
     </div>
 
+    <!-- 设置面板 -->
     <div class="settings-panel" id="settingsPanel">
         <button class="close-settings" id="closeSettings">&times;</button>
         <h3>时钟设置</h3>
         
+        <!-- 时间显示设置 -->
         <div class="setting-group">
             <h4>⏰ 时间显示设置</h4>
             <div class="setting-item">
@@ -257,13 +264,15 @@
             <div class="setting-item">
                 <label for="timeFontFamily">字体样式</label>
                 <select id="timeFontFamily">
-                    <option value="'Courier New', monospace" selected>数码管等宽 (稳定不跳动)</option>
-                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">默认无衬线</option>
-                    <option value="'Press Start 2P', cursive">像素风格 (实验性)</option>
+                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" selected>默认无衬线</option>
+                    <option value="'DSEG7 Classic', 'Courier New', monospace">数码管</option>
+                    <option value="'Press Start 2P', cursive">像素</option>
+                    <option value="'Orbitron', sans-serif">未来感</option>
                 </select>
             </div>
         </div>
         
+        <!-- 日期显示设置 -->
         <div class="setting-group">
             <h4>📅 日期显示设置</h4>
             <div class="setting-item">
@@ -289,13 +298,15 @@
             <div class="setting-item">
                 <label for="dateFontFamily">字体样式</label>
                 <select id="dateFontFamily">
-                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">默认无衬线</option>
-                    <option value="'Courier New', monospace">数码管等宽</option>
-                    <option value="'Press Start 2P', cursive">像素风格</option>
+                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" selected>默认无衬线</option>
+                    <option value="'DSEG7 Classic', 'Courier New', monospace">数码管</option>
+                    <option value="'Press Start 2P', cursive">像素</option>
+                    <option value="'Orbitron', sans-serif">未来感</option>
                 </select>
             </div>
         </div>
         
+        <!-- 背景设置 -->
         <div class="setting-group">
             <h4>🎨 背景设置</h4>
             <div class="setting-item">
@@ -316,11 +327,12 @@
     </div>
 
     <script>
+        // 默认设置：时间字体改为默认无衬线
         const defaultSettings = {
             timeFontSize: 8,
             timeColor: '#ffffff',
             timeFontWeight: '300',
-            timeFontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            timeFontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", // 默认无衬线
             dateFontSize: 2,
             dateColor: '#ffffff',
             dateFontWeight: '300',
@@ -335,25 +347,21 @@
         const timeEl = document.querySelector('.time');
         const dateEl = document.querySelector('.date');
 
-        // 核心：根据窗口宽度和当前设置计算字体大小（无上限，仅设最小值保护）
         function updateFontSizeByWindow() {
             const winWidth = document.documentElement.clientWidth;
-            const baseFontSize = 16; // 默认1rem = 16px
+            const baseFontSize = 16;
             const scale = winWidth / 1200;
 
-            // 时间字体：只设最小值，取消上限
             let timePx = currentAppliedSettings.timeFontSize * baseFontSize * scale;
-            if (timePx < 20) timePx = 20; // 保护，防止过小
+            if (timePx < 20) timePx = 20;
             timeEl.style.fontSize = timePx + 'px';
 
-            // 日期字体：只设最小值
             let datePx = currentAppliedSettings.dateFontSize * baseFontSize * scale;
             if (datePx < 12) datePx = 12;
             dateEl.style.fontSize = datePx + 'px';
         }
 
         function applySettings(settings) {
-            // 更新CSS变量
             document.documentElement.style.setProperty('--time-color', settings.timeColor);
             document.documentElement.style.setProperty('--date-color', settings.dateColor);
             document.documentElement.style.setProperty('--time-weight', settings.timeFontWeight);
