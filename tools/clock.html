@@ -22,6 +22,15 @@
             transition: background 0.2s ease;
         }
 
+        :root {
+            --time-color: #ffffff;
+            --date-color: #ffffff;
+            --time-weight: 300;
+            --date-weight: 300;
+            --time-family: 'Courier New', monospace;
+            --date-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
         .clock-container {
             text-align: center;
             color: white;
@@ -33,30 +42,31 @@
             align-items: center;
         }
 
-        /* 时间容器：固定宽度使用ch单位，保证无论数字宽窄变化，容器左边缘固定 */
         .time {
             display: inline-block;
-            width: 8ch;           /* 8个字符宽度 (HH:MM:SS) */
+            width: 8ch;
             max-width: 8ch;
             min-width: 8ch;
             text-align: center;
-            font-size: 8rem;
-            font-weight: 300;
             margin-bottom: 10px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.2);
             line-height: 1.2;
             white-space: nowrap;
-            font-variant-numeric: tabular-nums;  /* 辅助等宽数字 */
-            transition: font-size 0.1s ease, color 0.2s, font-family 0.2s;
+            font-variant-numeric: tabular-nums;
+            color: var(--time-color);
+            font-weight: var(--time-weight);
+            font-family: var(--time-family);
+            transition: color 0.2s, font-family 0.2s;
         }
 
         .date {
-            font-size: 2rem;
-            font-weight: 300;
             margin-bottom: 30px;
             opacity: 0.9;
-            transition: font-size 0.1s ease, color 0.2s, font-family 0.2s;
             white-space: nowrap;
+            color: var(--date-color);
+            font-weight: var(--date-weight);
+            font-family: var(--date-family);
+            transition: color 0.2s, font-family 0.2s;
         }
 
         .controls {
@@ -83,6 +93,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.2rem;
         }
 
         .btn:hover {
@@ -90,7 +101,6 @@
             transform: translateY(-2px);
         }
 
-        /* 设置面板 */
         .settings-panel {
             position: fixed;
             top: 0;
@@ -175,15 +185,19 @@
             background: rgba(0,0,0,0.08);
             border: 1px solid #ccc;
             min-width: 80px;
+            width: auto;
+            height: auto;
+            font-size: 0.9rem;
         }
 
-        /* 自适应增强：使用clamp让字体在极端尺寸更平滑，同时保留用户设置 */
         @media (max-width: 768px) {
             .time {
-                font-size: clamp(2.5rem, 15vw, 8rem);
+                width: 8ch;
+                min-width: 8ch;
             }
             .date {
-                font-size: clamp(1.2rem, 5vw, 2rem);
+                white-space: normal;
+                word-break: keep-all;
             }
             .settings-panel {
                 width: 100%;
@@ -197,41 +211,9 @@
             .btn {
                 width: 44px;
                 height: 44px;
-                font-size: 1.2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .clock-container {
-                padding: 10px;
-            }
-            .time {
-                font-size: clamp(2rem, 12vw, 4rem);
-                width: 8ch;        /* 保持固定宽度 */
-                min-width: 8ch;
-            }
-            .date {
-                font-size: clamp(1rem, 4vw, 1.5rem);
-                white-space: normal;  /* 日期过长允许换行 */
-                word-break: keep-all;
-            }
-            .controls {
-                top: 12px;
-                left: 12px;
-            }
-        }
-
-        /* 横屏或超宽屏优化 */
-        @media (min-width: 1200px) {
-            .time {
-                font-size: clamp(6rem, 10vw, 12rem);
-            }
-            .date {
-                font-size: clamp(1.8rem, 3vw, 3rem);
             }
         }
     </style>
-    <!-- 可选的像素字体 (不影响核心功能，仅用于扩展) 若网络不可用则回退到 cursive -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -243,20 +225,18 @@
     <div class="controls">
         <button class="btn" id="fullscreenBtn" title="全屏">⛶</button>
         <button class="btn" id="settingsBtn" title="设置">⚙️</button>
-        <!-- 返回首页按钮已移除 -->
     </div>
 
-    <!-- 设置面板 -->
     <div class="settings-panel" id="settingsPanel">
         <button class="close-settings" id="closeSettings">&times;</button>
         <h3>时钟设置</h3>
         
-        <!-- 时间显示设置 -->
         <div class="setting-group">
             <h4>⏰ 时间显示设置</h4>
             <div class="setting-item">
-                <label for="timeFontSize">字体大小 (rem)</label>
-                <input type="number" id="timeFontSize" min="1" max="20" step="0.5" value="8">
+                <label for="timeFontSize">相对大小 (基准1200px)</label>
+                <input type="number" id="timeFontSize" min="2" max="50" step="0.5" value="8">
+                <small style="color:#999;">数值越大，时间越大</small>
             </div>
             <div class="setting-item">
                 <label for="timeColor">字体颜色</label>
@@ -274,23 +254,21 @@
                     <option value="700">加粗 (700)</option>
                 </select>
             </div>
-            <!-- 新增：字体样式选择 (数码管等宽) -->
             <div class="setting-item">
                 <label for="timeFontFamily">字体样式</label>
                 <select id="timeFontFamily">
-                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">默认无衬线</option>
                     <option value="'Courier New', monospace" selected>数码管等宽 (稳定不跳动)</option>
+                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">默认无衬线</option>
                     <option value="'Press Start 2P', cursive">像素风格 (实验性)</option>
                 </select>
             </div>
         </div>
         
-        <!-- 日期显示设置 -->
         <div class="setting-group">
             <h4>📅 日期显示设置</h4>
             <div class="setting-item">
-                <label for="dateFontSize">字体大小 (rem)</label>
-                <input type="number" id="dateFontSize" min="1" max="10" step="0.5" value="2">
+                <label for="dateFontSize">相对大小 (基准1200px)</label>
+                <input type="number" id="dateFontSize" min="1" max="30" step="0.5" value="2">
             </div>
             <div class="setting-item">
                 <label for="dateColor">字体颜色</label>
@@ -308,7 +286,6 @@
                     <option value="700">加粗 (700)</option>
                 </select>
             </div>
-            <!-- 新增：日期字体样式 -->
             <div class="setting-item">
                 <label for="dateFontFamily">字体样式</label>
                 <select id="dateFontFamily">
@@ -319,7 +296,6 @@
             </div>
         </div>
         
-        <!-- 背景设置 -->
         <div class="setting-group">
             <h4>🎨 背景设置</h4>
             <div class="setting-item">
@@ -340,12 +316,11 @@
     </div>
 
     <script>
-        // 默认设置 (修改为：时间默认使用数码管等宽字体，保证位置固定)
         const defaultSettings = {
             timeFontSize: 8,
             timeColor: '#ffffff',
             timeFontWeight: '300',
-            timeFontFamily: "'Courier New', monospace",      // 等宽数码管，消除跳动
+            timeFontFamily: "'Courier New', monospace",
             dateFontSize: 2,
             dateColor: '#ffffff',
             dateFontWeight: '300',
@@ -354,34 +329,44 @@
             bgColor2: '#000000'
         };
 
-        // 当前应用的设置
         let currentAppliedSettings = {...defaultSettings};
-        // 打开面板时的设置快照
         let settingsAtOpen = {...defaultSettings};
 
-        // 应用设置到DOM
-        function applySettings(settings) {
-            // 时间样式
-            const timeEl = document.querySelector('.time');
-            timeEl.style.fontSize = settings.timeFontSize + 'rem';
-            timeEl.style.color = settings.timeColor;
-            timeEl.style.fontWeight = settings.timeFontWeight;
-            timeEl.style.fontFamily = settings.timeFontFamily;
-            
-            // 日期样式
-            const dateEl = document.querySelector('.date');
-            dateEl.style.fontSize = settings.dateFontSize + 'rem';
-            dateEl.style.color = settings.dateColor;
-            dateEl.style.fontWeight = settings.dateFontWeight;
-            dateEl.style.fontFamily = settings.dateFontFamily;
-            
-            // 背景渐变
-            document.body.style.background = `linear-gradient(135deg, ${settings.bgColor1} 0%, ${settings.bgColor2} 100%)`;
-            
-            currentAppliedSettings = {...settings};
+        const timeEl = document.querySelector('.time');
+        const dateEl = document.querySelector('.date');
+
+        // 核心：根据窗口宽度和当前设置计算字体大小（无上限，仅设最小值保护）
+        function updateFontSizeByWindow() {
+            const winWidth = document.documentElement.clientWidth;
+            const baseFontSize = 16; // 默认1rem = 16px
+            const scale = winWidth / 1200;
+
+            // 时间字体：只设最小值，取消上限
+            let timePx = currentAppliedSettings.timeFontSize * baseFontSize * scale;
+            if (timePx < 20) timePx = 20; // 保护，防止过小
+            timeEl.style.fontSize = timePx + 'px';
+
+            // 日期字体：只设最小值
+            let datePx = currentAppliedSettings.dateFontSize * baseFontSize * scale;
+            if (datePx < 12) datePx = 12;
+            dateEl.style.fontSize = datePx + 'px';
         }
 
-        // 实时预览：从面板读取当前值并应用
+        function applySettings(settings) {
+            // 更新CSS变量
+            document.documentElement.style.setProperty('--time-color', settings.timeColor);
+            document.documentElement.style.setProperty('--date-color', settings.dateColor);
+            document.documentElement.style.setProperty('--time-weight', settings.timeFontWeight);
+            document.documentElement.style.setProperty('--date-weight', settings.dateFontWeight);
+            document.documentElement.style.setProperty('--time-family', settings.timeFontFamily);
+            document.documentElement.style.setProperty('--date-family', settings.dateFontFamily);
+
+            document.body.style.background = `linear-gradient(135deg, ${settings.bgColor1} 0%, ${settings.bgColor2} 100%)`;
+
+            currentAppliedSettings = {...settings};
+            updateFontSizeByWindow();
+        }
+
         function previewSettings() {
             const settings = {
                 timeFontSize: parseFloat(document.getElementById('timeFontSize').value),
@@ -398,27 +383,23 @@
             applySettings(settings);
         }
 
-        // 保存到localStorage
         function saveSettingsToStorage(settings) {
             localStorage.setItem('clockSettings', JSON.stringify(settings));
         }
 
-        // 从localStorage读取
         function getSettingsFromStorage() {
             const settings = localStorage.getItem('clockSettings');
             return settings ? JSON.parse(settings) : null;
         }
 
-        // 加载设置：优先本地存储，否则默认
         function loadSettings() {
             const savedSettings = getSettingsFromStorage();
             if (savedSettings) {
                 applySettings(savedSettings);
-                // 更新面板值
                 document.getElementById('timeFontSize').value = savedSettings.timeFontSize;
                 document.getElementById('timeColor').value = savedSettings.timeColor;
                 document.getElementById('timeFontWeight').value = savedSettings.timeFontWeight;
-                document.getElementById('timeFontFamily').value = savedSettings.timeFontFamily || defaultSettings.timeFontFamily; // 兼容旧版
+                document.getElementById('timeFontFamily').value = savedSettings.timeFontFamily || defaultSettings.timeFontFamily;
                 document.getElementById('dateFontSize').value = savedSettings.dateFontSize;
                 document.getElementById('dateColor').value = savedSettings.dateColor;
                 document.getElementById('dateFontWeight').value = savedSettings.dateFontWeight;
@@ -427,7 +408,6 @@
                 document.getElementById('bgColor2').value = savedSettings.bgColor2;
             } else {
                 applySettings(defaultSettings);
-                // 面板设为默认值
                 document.getElementById('timeFontSize').value = defaultSettings.timeFontSize;
                 document.getElementById('timeColor').value = defaultSettings.timeColor;
                 document.getElementById('timeFontWeight').value = defaultSettings.timeFontWeight;
@@ -441,7 +421,6 @@
             }
         }
 
-        // 更新时间
         function updateTime() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -457,11 +436,9 @@
             document.getElementById('date').textContent = `${year}年${month}月${day}日 ${weekday}`;
         }
 
-        // 初始化
         updateTime();
         setInterval(updateTime, 1000);
 
-        // 全屏切换
         document.getElementById('fullscreenBtn').addEventListener('click', () => {
             if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
                 if (document.exitFullscreen) document.exitFullscreen();
@@ -475,10 +452,8 @@
             }
         });
 
-        // 设置按钮：打开面板并记录当前设置
         document.getElementById('settingsBtn').addEventListener('click', () => {
             settingsAtOpen = {...currentAppliedSettings};
-            // 同步面板显示为当前设置
             document.getElementById('timeFontSize').value = currentAppliedSettings.timeFontSize;
             document.getElementById('timeColor').value = currentAppliedSettings.timeColor;
             document.getElementById('timeFontWeight').value = currentAppliedSettings.timeFontWeight;
@@ -492,13 +467,11 @@
             document.getElementById('settingsPanel').classList.add('active');
         });
 
-        // 关闭面板（X）: 恢复到打开前的设置
         document.getElementById('closeSettings').addEventListener('click', () => {
             applySettings(settingsAtOpen);
             document.getElementById('settingsPanel').classList.remove('active');
         });
 
-        // 保存设置
         document.getElementById('saveSettings').addEventListener('click', () => {
             const settings = {
                 timeFontSize: parseFloat(document.getElementById('timeFontSize').value),
@@ -517,11 +490,9 @@
             document.getElementById('settingsPanel').classList.remove('active');
         });
 
-        // 恢复默认设置
         document.getElementById('resetSettings').addEventListener('click', () => {
             applySettings(defaultSettings);
             saveSettingsToStorage(defaultSettings);
-            // 更新面板
             document.getElementById('timeFontSize').value = defaultSettings.timeFontSize;
             document.getElementById('timeColor').value = defaultSettings.timeColor;
             document.getElementById('timeFontWeight').value = defaultSettings.timeFontWeight;
@@ -534,16 +505,17 @@
             document.getElementById('bgColor2').value = defaultSettings.bgColor2;
         });
 
-        // 取消设置 (同关闭)
         document.getElementById('cancelSettings').addEventListener('click', () => {
             applySettings(settingsAtOpen);
             document.getElementById('settingsPanel').classList.remove('active');
         });
 
-        // 加载完成执行
+        window.addEventListener('resize', () => {
+            updateFontSizeByWindow();
+        });
+
         window.addEventListener('load', () => {
             loadSettings();
-            // 添加实时预览监听
             document.getElementById('timeFontSize').addEventListener('input', previewSettings);
             document.getElementById('timeColor').addEventListener('input', previewSettings);
             document.getElementById('timeFontWeight').addEventListener('change', previewSettings);
@@ -554,11 +526,6 @@
             document.getElementById('dateFontFamily').addEventListener('change', previewSettings);
             document.getElementById('bgColor1').addEventListener('input', previewSettings);
             document.getElementById('bgColor2').addEventListener('input', previewSettings);
-        });
-
-        // 增加 resize 平滑 (仅辅助，主要依靠CSS clamp)
-        window.addEventListener('resize', () => {
-            // 可选：不做额外操作，CSS已经处理自适应
         });
     </script>
 </body>
