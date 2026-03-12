@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>全屏时钟</title>
-    <!-- 引入数码管字体 DSEG7、像素字体 Press Start 2P、未来感字体 Orbitron -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -45,25 +44,33 @@
             align-items: center;
         }
 
-        /* 时间容器：固定宽度，Flex 居中，确保即使字符宽度不同，中心点固定，左边缘不变 */
+        /* --- 修复：时间居中且不抖动 --- */
         .time {
-            display: flex;
-            justify-content: center;      /* 水平居中 */
-            align-items: center;          /* 垂直居中（可选） */
-            width: min(45vw, 600px);      /* 固定物理宽度，位置不变 */
-            max-width: min(45vw, 600px);
-            min-width: 200px;              /* 最小宽度保证可读 */
+            display: grid;
+            /* 使用 min-content 确保容器宽度随文字大小自适应 */
+            width: max-content; 
+            /* 8个槽位：数字x2, 冒号, 数字x2, 冒号, 数字x2 */
+            /* 使用 ch 单位确保每个槽位宽度一致（等宽化处理） */
+            grid-template-columns: 1ch 1ch 0.5ch 1ch 1ch 0.5ch 1ch 1ch;
+            justify-content: center; /* 水平居中所有网格列 */
+            justify-items: center;
+            align-items: center;
             margin-bottom: 10px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.2);
             line-height: 1.2;
             white-space: nowrap;
-            font-variant-numeric: tabular-nums;
             color: var(--time-color);
             font-weight: var(--time-weight);
             font-family: var(--time-family);
             transition: color 0.2s, font-family 0.2s;
-            overflow: visible;             /* 允许文本溢出，但居中溢出，不改变容器位置 */
         }
+
+        /* 保证每个数字在自己的格子内居中 */
+        .time span {
+            display: inline-block;
+            text-align: center;
+        }
+        /* -------------------------- */
 
         .date {
             margin-bottom: 30px;
@@ -92,7 +99,6 @@
             padding: 10px 20px;
             border-radius: 25px;
             cursor: pointer;
-            font-size: 1rem;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
             width: 50px;
@@ -117,7 +123,6 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 20px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
             transition: right 0.3s ease;
             overflow-y: auto;
             z-index: 1000;
@@ -125,110 +130,26 @@
             box-sizing: border-box;
         }
 
-        .settings-panel.active {
-            right: 0;
-        }
-
-        .settings-panel h3 {
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.5rem;
-        }
-
-        .setting-group {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(0,0,0,0.05);
-            border-radius: 10px;
-        }
-
-        .setting-group h4 {
-            color: #555;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-
-        .setting-item {
-            margin-bottom: 12px;
-        }
-
-        .setting-item label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .setting-item input, .setting-item select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: white;
-            font-size: 0.9rem;
-        }
-
-        .close-settings {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .settings-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .settings-actions .btn {
-            flex: 1;
-            padding: 12px;
-            color: #333;
-            background: rgba(0,0,0,0.08);
-            border: 1px solid #ccc;
-            min-width: 80px;
-            width: auto;
-            height: auto;
-            font-size: 0.9rem;
-        }
+        .settings-panel.active { right: 0; }
+        .settings-panel h3 { color: #333; margin-bottom: 20px; text-align: center; font-size: 1.5rem; }
+        .setting-group { margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 10px; }
+        .setting-group h4 { color: #555; margin-bottom: 10px; font-size: 1.1rem; }
+        .setting-item { margin-bottom: 12px; }
+        .setting-item label { display: block; margin-bottom: 5px; color: #666; font-size: 0.9rem; }
+        .setting-item input, .setting-item select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; background: white; }
+        .close-settings { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; }
+        .settings-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .settings-actions .btn { flex: 1; padding: 12px; color: #333; background: rgba(0,0,0,0.08); border: 1px solid #ccc; width: auto; height: auto; font-size: 0.9rem; }
 
         @media (max-width: 768px) {
-            .time {
-                width: min(70vw, 400px);
-                min-width: 150px;
-            }
-            .date {
-                white-space: normal;
-                word-break: keep-all;
-            }
-            .settings-panel {
-                width: 100%;
-                right: -100%;
-            }
-            .controls {
-                top: 10px;
-                left: 10px;
-                gap: 10px;
-            }
-            .btn {
-                width: 44px;
-                height: 44px;
-            }
+            .settings-panel { width: 100%; right: -100%; }
         }
     </style>
 </head>
 <body>
     <div class="clock-container">
-        <div class="time" id="time">00:00:00</div>
-        <div class="date" id="date">2023年1月1日 星期一</div>
+        <div class="time" id="time"></div>
+        <div class="date" id="date"></div>
     </div>
     
     <div class="controls">
@@ -236,90 +157,69 @@
         <button class="btn" id="settingsBtn" title="设置">⚙️</button>
     </div>
 
-    <!-- 设置面板 -->
     <div class="settings-panel" id="settingsPanel">
         <button class="close-settings" id="closeSettings">&times;</button>
         <h3>时钟设置</h3>
-        
-        <!-- 时间显示设置 -->
         <div class="setting-group">
-            <h4>⏰ 时间显示设置</h4>
+            <h4>⏰ 时间设置</h4>
             <div class="setting-item">
-                <label for="timeFontSize">相对大小 (基准1200px)</label>
+                <label>相对大小</label>
                 <input type="number" id="timeFontSize" min="2" max="50" step="0.5" value="8">
-                <small style="color:#999;">数值越大，时间越大</small>
             </div>
             <div class="setting-item">
-                <label for="timeColor">字体颜色</label>
+                <label>字体颜色</label>
                 <input type="color" id="timeColor" value="#ffffff">
             </div>
             <div class="setting-item">
-                <label for="timeFontWeight">字体粗细</label>
+                <label>字体粗细</label>
                 <select id="timeFontWeight">
-                    <option value="100">细体 (100)</option>
-                    <option value="200">较细 (200)</option>
-                    <option value="300" selected>正常 (300)</option>
-                    <option value="400">中等 (400)</option>
-                    <option value="500">粗体 (500)</option>
-                    <option value="600">较粗 (600)</option>
-                    <option value="700">加粗 (700)</option>
+                    <option value="100">100</option><option value="200">200</option><option value="300" selected>300</option>
+                    <option value="400">400</option><option value="500">500</option><option value="700">700</option>
                 </select>
             </div>
             <div class="setting-item">
-                <label for="timeFontFamily">字体样式</label>
+                <label>字体样式</label>
                 <select id="timeFontFamily">
-                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" selected>默认无衬线</option>
-                    <option value="'DSEG7 Classic', 'Courier New', monospace">数码管</option>
+                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">默认</option>
+                    <option value="'DSEG7 Classic', monospace">数码管</option>
                     <option value="'Press Start 2P', cursive">像素</option>
                     <option value="'Orbitron', sans-serif">未来感</option>
                 </select>
             </div>
         </div>
-        
-        <!-- 日期显示设置 -->
+
         <div class="setting-group">
-            <h4>📅 日期显示设置</h4>
+            <h4>📅 日期设置</h4>
             <div class="setting-item">
-                <label for="dateFontSize">相对大小 (基准1200px)</label>
+                <label>相对大小</label>
                 <input type="number" id="dateFontSize" min="1" max="30" step="0.5" value="2">
             </div>
             <div class="setting-item">
-                <label for="dateColor">字体颜色</label>
+                <label>字体颜色</label>
                 <input type="color" id="dateColor" value="#ffffff">
             </div>
             <div class="setting-item">
-                <label for="dateFontWeight">字体粗细</label>
+                <label>字体粗细</label>
                 <select id="dateFontWeight">
-                    <option value="100">细体 (100)</option>
-                    <option value="200">较细 (200)</option>
-                    <option value="300" selected>正常 (300)</option>
-                    <option value="400">中等 (400)</option>
-                    <option value="500">粗体 (500)</option>
-                    <option value="600">较粗 (600)</option>
-                    <option value="700">加粗 (700)</option>
+                    <option value="100">100</option><option value="300" selected>300</option><option value="500">500</option>
                 </select>
             </div>
             <div class="setting-item">
-                <label for="dateFontFamily">字体样式</label>
+                <label>字体样式</label>
                 <select id="dateFontFamily">
-                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" selected>默认无衬线</option>
-                    <option value="'DSEG7 Classic', 'Courier New', monospace">数码管</option>
-                    <option value="'Press Start 2P', cursive">像素</option>
+                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">默认</option>
                     <option value="'Orbitron', sans-serif">未来感</option>
                 </select>
             </div>
         </div>
         
-        <!-- 背景设置 -->
         <div class="setting-group">
             <h4>🎨 背景设置</h4>
             <div class="setting-item">
-                <label for="bgColor1">背景渐变色1</label>
-                <input type="color" id="bgColor1" value="#000000">
+                <label>背景色1</label><input type="color" id="bgColor1" value="#000000">
             </div>
             <div class="setting-item">
-                <label for="bgColor2">背景渐变色2</label>
-                <input type="color" id="bgColor2" value="#000000">
+                <label>背景色2</label><input type="color" id="bgColor2" value="#000000">
             </div>
         </div>
         
@@ -332,36 +232,22 @@
 
     <script>
         const defaultSettings = {
-            timeFontSize: 8,
-            timeColor: '#ffffff',
-            timeFontWeight: '300',
-            timeFontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-            dateFontSize: 2,
-            dateColor: '#ffffff',
-            dateFontWeight: '300',
-            dateFontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-            bgColor1: '#000000',
-            bgColor2: '#000000'
+            timeFontSize: 8, timeColor: '#ffffff', timeFontWeight: '300', timeFontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+            dateFontSize: 2, dateColor: '#ffffff', dateFontWeight: '300', dateFontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+            bgColor1: '#000000', bgColor2: '#000000'
         };
 
         let currentAppliedSettings = {...defaultSettings};
         let settingsAtOpen = {...defaultSettings};
 
-        const timeEl = document.querySelector('.time');
-        const dateEl = document.querySelector('.date');
+        const timeEl = document.getElementById('time');
+        const dateEl = document.getElementById('date');
 
         function updateFontSizeByWindow() {
             const winWidth = document.documentElement.clientWidth;
-            const baseFontSize = 16;
             const scale = winWidth / 1200;
-
-            let timePx = currentAppliedSettings.timeFontSize * baseFontSize * scale;
-            if (timePx < 20) timePx = 20;
-            timeEl.style.fontSize = timePx + 'px';
-
-            let datePx = currentAppliedSettings.dateFontSize * baseFontSize * scale;
-            if (datePx < 12) datePx = 12;
-            dateEl.style.fontSize = datePx + 'px';
+            timeEl.style.fontSize = Math.max(20, currentAppliedSettings.timeFontSize * 16 * scale) + 'px';
+            dateEl.style.fontSize = Math.max(12, currentAppliedSettings.dateFontSize * 16 * scale) + 'px';
         }
 
         function applySettings(settings) {
@@ -371,9 +257,7 @@
             document.documentElement.style.setProperty('--date-weight', settings.dateFontWeight);
             document.documentElement.style.setProperty('--time-family', settings.timeFontFamily);
             document.documentElement.style.setProperty('--date-family', settings.dateFontFamily);
-
-            document.body.style.background = `linear-gradient(135deg, ${settings.bgColor1} 0%, ${settings.bgColor2} 100%)`;
-
+            document.body.style.background = `linear-gradient(135deg, ${settings.bgColor1}, ${settings.bgColor2})`;
             currentAppliedSettings = {...settings};
             updateFontSizeByWindow();
         }
@@ -394,150 +278,63 @@
             applySettings(settings);
         }
 
-        function saveSettingsToStorage(settings) {
-            localStorage.setItem('clockSettings', JSON.stringify(settings));
-        }
-
-        function getSettingsFromStorage() {
-            const settings = localStorage.getItem('clockSettings');
-            return settings ? JSON.parse(settings) : null;
-        }
-
-        function loadSettings() {
-            const savedSettings = getSettingsFromStorage();
-            if (savedSettings) {
-                applySettings(savedSettings);
-                document.getElementById('timeFontSize').value = savedSettings.timeFontSize;
-                document.getElementById('timeColor').value = savedSettings.timeColor;
-                document.getElementById('timeFontWeight').value = savedSettings.timeFontWeight;
-                document.getElementById('timeFontFamily').value = savedSettings.timeFontFamily || defaultSettings.timeFontFamily;
-                document.getElementById('dateFontSize').value = savedSettings.dateFontSize;
-                document.getElementById('dateColor').value = savedSettings.dateColor;
-                document.getElementById('dateFontWeight').value = savedSettings.dateFontWeight;
-                document.getElementById('dateFontFamily').value = savedSettings.dateFontFamily || defaultSettings.dateFontFamily;
-                document.getElementById('bgColor1').value = savedSettings.bgColor1;
-                document.getElementById('bgColor2').value = savedSettings.bgColor2;
-            } else {
-                applySettings(defaultSettings);
-                document.getElementById('timeFontSize').value = defaultSettings.timeFontSize;
-                document.getElementById('timeColor').value = defaultSettings.timeColor;
-                document.getElementById('timeFontWeight').value = defaultSettings.timeFontWeight;
-                document.getElementById('timeFontFamily').value = defaultSettings.timeFontFamily;
-                document.getElementById('dateFontSize').value = defaultSettings.dateFontSize;
-                document.getElementById('dateColor').value = defaultSettings.dateColor;
-                document.getElementById('dateFontWeight').value = defaultSettings.dateFontWeight;
-                document.getElementById('dateFontFamily').value = defaultSettings.dateFontFamily;
-                document.getElementById('bgColor1').value = defaultSettings.bgColor1;
-                document.getElementById('bgColor2').value = defaultSettings.bgColor2;
-            }
-        }
-
         function updateTime() {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
             
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const day = now.getDate();
+            // 每一个字符包含冒号都用 span 包裹
+            timeEl.innerHTML = `
+                <span>${h[0]}</span><span>${h[1]}</span><span>:</span>
+                <span>${m[0]}</span><span>${m[1]}</span><span>:</span>
+                <span>${s[0]}</span><span>${s[1]}</span>
+            `;
+            
             const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            const weekday = weekdays[now.getDay()];
-            document.getElementById('date').textContent = `${year}年${month}月${day}日 ${weekday}`;
+            dateEl.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${weekdays[now.getDay()]}`;
         }
 
-        updateTime();
-        setInterval(updateTime, 1000);
-
-        document.getElementById('fullscreenBtn').addEventListener('click', () => {
-            if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                else if (document.msExitFullscreen) document.msExitFullscreen();
-            } else {
-                const elem = document.documentElement;
-                if (elem.requestFullscreen) elem.requestFullscreen();
-                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-                else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
-            }
-        });
-
-        document.getElementById('settingsBtn').addEventListener('click', () => {
+        // 事件绑定
+        document.getElementById('settingsBtn').onclick = () => {
             settingsAtOpen = {...currentAppliedSettings};
-            document.getElementById('timeFontSize').value = currentAppliedSettings.timeFontSize;
-            document.getElementById('timeColor').value = currentAppliedSettings.timeColor;
-            document.getElementById('timeFontWeight').value = currentAppliedSettings.timeFontWeight;
-            document.getElementById('timeFontFamily').value = currentAppliedSettings.timeFontFamily;
-            document.getElementById('dateFontSize').value = currentAppliedSettings.dateFontSize;
-            document.getElementById('dateColor').value = currentAppliedSettings.dateColor;
-            document.getElementById('dateFontWeight').value = currentAppliedSettings.dateFontWeight;
-            document.getElementById('dateFontFamily').value = currentAppliedSettings.dateFontFamily;
-            document.getElementById('bgColor1').value = currentAppliedSettings.bgColor1;
-            document.getElementById('bgColor2').value = currentAppliedSettings.bgColor2;
             document.getElementById('settingsPanel').classList.add('active');
-        });
-
-        document.getElementById('closeSettings').addEventListener('click', () => {
+        };
+        document.getElementById('closeSettings').onclick = () => {
             applySettings(settingsAtOpen);
             document.getElementById('settingsPanel').classList.remove('active');
-        });
-
-        document.getElementById('saveSettings').addEventListener('click', () => {
-            const settings = {
-                timeFontSize: parseFloat(document.getElementById('timeFontSize').value),
-                timeColor: document.getElementById('timeColor').value,
-                timeFontWeight: document.getElementById('timeFontWeight').value,
-                timeFontFamily: document.getElementById('timeFontFamily').value,
-                dateFontSize: parseFloat(document.getElementById('dateFontSize').value),
-                dateColor: document.getElementById('dateColor').value,
-                dateFontWeight: document.getElementById('dateFontWeight').value,
-                dateFontFamily: document.getElementById('dateFontFamily').value,
-                bgColor1: document.getElementById('bgColor1').value,
-                bgColor2: document.getElementById('bgColor2').value
-            };
-            applySettings(settings);
-            saveSettingsToStorage(settings);
+        };
+        document.getElementById('saveSettings').onclick = () => {
+            previewSettings();
+            localStorage.setItem('clockSettings', JSON.stringify(currentAppliedSettings));
             document.getElementById('settingsPanel').classList.remove('active');
-        });
-
-        document.getElementById('resetSettings').addEventListener('click', () => {
+        };
+        document.getElementById('resetSettings').onclick = () => {
             applySettings(defaultSettings);
-            saveSettingsToStorage(defaultSettings);
-            document.getElementById('timeFontSize').value = defaultSettings.timeFontSize;
-            document.getElementById('timeColor').value = defaultSettings.timeColor;
-            document.getElementById('timeFontWeight').value = defaultSettings.timeFontWeight;
-            document.getElementById('timeFontFamily').value = defaultSettings.timeFontFamily;
-            document.getElementById('dateFontSize').value = defaultSettings.dateFontSize;
-            document.getElementById('dateColor').value = defaultSettings.dateColor;
-            document.getElementById('dateFontWeight').value = defaultSettings.dateFontWeight;
-            document.getElementById('dateFontFamily').value = defaultSettings.dateFontFamily;
-            document.getElementById('bgColor1').value = defaultSettings.bgColor1;
-            document.getElementById('bgColor2').value = defaultSettings.bgColor2;
-        });
-
-        document.getElementById('cancelSettings').addEventListener('click', () => {
+            localStorage.removeItem('clockSettings');
+        };
+        document.getElementById('cancelSettings').onclick = () => {
             applySettings(settingsAtOpen);
             document.getElementById('settingsPanel').classList.remove('active');
-        });
+        };
+        document.getElementById('fullscreenBtn').onclick = () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        };
 
-        window.addEventListener('resize', () => {
-            updateFontSizeByWindow();
-        });
-
+        window.addEventListener('resize', updateFontSizeByWindow);
         window.addEventListener('load', () => {
-            loadSettings();
-            document.getElementById('timeFontSize').addEventListener('input', previewSettings);
-            document.getElementById('timeColor').addEventListener('input', previewSettings);
-            document.getElementById('timeFontWeight').addEventListener('change', previewSettings);
-            document.getElementById('timeFontFamily').addEventListener('change', previewSettings);
-            document.getElementById('dateFontSize').addEventListener('input', previewSettings);
-            document.getElementById('dateColor').addEventListener('input', previewSettings);
-            document.getElementById('dateFontWeight').addEventListener('change', previewSettings);
-            document.getElementById('dateFontFamily').addEventListener('change', previewSettings);
-            document.getElementById('bgColor1').addEventListener('input', previewSettings);
-            document.getElementById('bgColor2').addEventListener('input', previewSettings);
+            const saved = localStorage.getItem('clockSettings');
+            if (saved) applySettings(JSON.parse(saved));
+            else applySettings(defaultSettings);
+            
+            document.querySelectorAll('.setting-item input, .setting-item select').forEach(el => {
+                el.addEventListener('input', previewSettings);
+            });
         });
+
+        setInterval(updateTime, 1000);
+        updateTime();
     </script>
 </body>
 </html>
